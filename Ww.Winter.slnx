@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="Ww.Winter.Generator.Tests/Ww.Winter.Generator.Tests.csproj" />
+  <Project Path="Ww.Winter.Generator/Ww.Winter.Generator.csproj" />
+  <Project Path="Ww.Winter.SomeApi/Ww.Winter.SomeApi.csproj" Id="fe290c7d-52d0-4c04-8a90-e480c8467331" />
+  <Project Path="Ww.Winter.SomeApp/Ww.Winter.SomeApp.csproj" />
+  <Project Path="Ww.Winter.SomeShared/Ww.Winter.SomeShared.csproj" Id="75a56213-1be5-48d0-84d0-fcbb8bbd2fbe" />
+  <Project Path="Ww.Winter/Ww.Winter.csproj" />
+</Solution>
