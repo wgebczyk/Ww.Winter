@@ -182,11 +182,11 @@ public record QueryFilterType
     {
         var namespaceSyntax = syntax.Parent as BaseNamespaceDeclarationSyntax;
         string @namespace;
-        if (namespaceSyntax.Name is QualifiedNameSyntax qualifiedNamespace)
+        if (namespaceSyntax?.Name is QualifiedNameSyntax qualifiedNamespace)
         {
             @namespace = qualifiedNamespace.Left.ToFullString() + "." + qualifiedNamespace.Right.Identifier.ValueText;
         }
-        else if (namespaceSyntax.Name is IdentifierNameSyntax identifierNamespace)
+        else if (namespaceSyntax?.Name is IdentifierNameSyntax identifierNamespace)
         {
             @namespace = identifierNamespace.Identifier.ValueText;
         }

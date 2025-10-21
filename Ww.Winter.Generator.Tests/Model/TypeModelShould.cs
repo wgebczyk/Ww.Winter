@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Ww.Winter.Generator.BasicQueries;
 using Ww.Winter.Generator.Model;
 
 namespace Ww.Winter.Generator.Tests.Model;
@@ -83,29 +82,9 @@ public sealed class TypeModelShould
 
         var typeModel = TypeModel.FromSyntax(root.GetRoot().DescendantNodes().OfType<RecordDeclarationSyntax>().Single(x => x.Identifier.ValueText == expectedName));
 
-        typeModel.Should().NotBeNull();
         typeModel.Namespace.Should().Be(expectedNamespace);
         typeModel.Name.Should().Be(expectedName);
         typeModel.FullyQualifiedName.Should().Be(expectedFullyQualifiedName);
         typeModel.ParentTypes.Should().BeEquivalentTo(expectedParentTypes);
-    }
-
-    public static GeneratorDriver DriveBasicQuery(params IReadOnlyList<string> sources)
-    {
-        var syntaxTrees = sources.Select(x => CSharpSyntaxTree.ParseText(x)).ToList();
-
-        CSharpCompilation compilation = CSharpCompilation.Create(
-            assemblyName: "Ww.Winter.Generator.Tests__",
-            syntaxTrees,
-            references: []
-        );
-
-        var generator = new BasicQueryIncrementalGenerator();
-
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
-
-        driver = driver.RunGenerators(compilation);
-
-        return driver;
     }
 }
