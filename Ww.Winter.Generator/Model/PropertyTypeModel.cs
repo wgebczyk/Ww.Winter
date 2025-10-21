@@ -22,7 +22,7 @@ public record PropertyTypeModel(
         {
             return FromSyntaxCore(namedType, semanticModel, maxDepth);
         }
-        return new PropertyTypeModel(Name: "TODO", Entity: null);
+        throw new InvalidOperationException($"Unsupported syntax {syntax}");
     }
 
     public static PropertyTypeModel FromSymbol(ITypeSymbol symbol, int maxDepth)
@@ -36,7 +36,9 @@ public record PropertyTypeModel(
         {
             return new PropertyTypeModel(Name: symbol.Name, Entity: null);
         }
-        return new PropertyTypeModel(Name: symbol.Name, Entity: EntityModel.FromSymbol(symbol, maxDepth - 1));
+
+        var entity = EntityModel.FromSymbol(symbol, maxDepth - 1);
+        return new PropertyTypeModel(Name: entity.Type.Name, Entity: entity);
     }
 
     private static PropertyTypeModel FromSyntaxCore(PredefinedTypeSyntax syntax)
@@ -56,29 +58,63 @@ public record PropertyTypeModel(
     }
     private static bool TrySpecialType(ITypeSymbol type, [MaybeNullWhen(false)] out PropertyTypeModel model)
     {
+        string? name = null;
         switch (type.SpecialType)
         {
             case SpecialType.System_String:
+                name = "string";
+                break;
             case SpecialType.System_Char:
+                name = "char";
+                break;
 
             case SpecialType.System_DateTime:
-            case SpecialType.System_Enum:
+                name = "DateTime";
+                break;
 
             case SpecialType.System_Boolean:
+                name = "bool";
+                break;
             case SpecialType.System_Byte:
+                name = "byte";
+                break;
             case SpecialType.System_SByte:
+                name = "sbyte";
+                break;
             case SpecialType.System_Int16:
+                name = "short";
+                break;
             case SpecialType.System_UInt16:
+                name = "ushort";
+                break;
             case SpecialType.System_Int32:
+                name = "int";
+                break;
             case SpecialType.System_UInt32:
+                name = "uint";
+                break;
             case SpecialType.System_Int64:
+                name = "long";
+                break;
             case SpecialType.System_UInt64:
+                name = "ulong";
+                break;
             case SpecialType.System_Decimal:
+                name = "decimal";
+                break;
             case SpecialType.System_Single:
+                name = "float";
+                break;
             case SpecialType.System_Double:
-                model = new PropertyTypeModel(Name: type.Name, Entity: null);
-                return true;
+                name = "double";
+                break;
         }
+        if (name is not null)
+        {
+            model = new PropertyTypeModel(Name: name, Entity: null);
+            return true;
+        }
+
         model = null;
         return false;
     }

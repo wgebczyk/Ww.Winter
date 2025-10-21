@@ -54,9 +54,9 @@ public record TypeModel(
         }
         parentTypes.Reverse();
 
-        var name = symbol.Name;
-        var ns = symbol.ContainingNamespace.Name;
-        string[] allParts = [ns, .. parentTypes, name];
+        var name = string.Join(".", [..parentTypes, symbol.Name]);
+        var ns = symbol.ContainingNamespace.ToDisplayString();
+        string[] allParts = [ns, name];
         var fullyQualifiedName = string.Join(".", allParts);
         return new TypeModel(ns, name, fullyQualifiedName, [.. parentTypes]);
     }
