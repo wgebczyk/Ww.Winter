@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using FluentAssertions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Ww.Winter.Generator.QueryableFilters;
 
@@ -11,13 +12,11 @@ public class QueryableFilterDebugging
     {
         var source1 =
         """
-        using Ww.Winter;
-
         namespace Ww.Winter.Generator.Tests;
 
         public partial class BookQueries
         {
-            [QueryableFilter(typeof(Ww.Winter.Some.Books.Book))]
+            [QueryableFilter(typeof(Ww.Winter.Some.Book))]
             public sealed partial class QueryBooksFilter
             {
                 public string? TitlePrefix { get; init; }
@@ -32,8 +31,6 @@ public class QueryableFilterDebugging
         """;
         var source2 =
         """
-        using Ww.Winter;
-
         namespace Ww.Winter.Generator.Tests;
         """;
 
@@ -54,12 +51,13 @@ public class QueryableFilterDebugging
                 MetadataReference.CreateFromFile(AppDomain.CurrentDomain.GetAssemblies().Single(a => a.GetName().Name == "System.Runtime").Location),
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(QueryableFilterAttribute).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(Ww.Winter.Some.Books.Book).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(Ww.Winter.Some.Book).Assembly.Location),
             ],
-            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable)
         );
 
-        var errors = compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        var diagnostics = compilation.GetDiagnostics();
+        diagnostics.Should().BeEmpty();
 
         var generator = new QueryableFilterIncrementalGenerator();
 

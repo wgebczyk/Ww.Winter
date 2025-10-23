@@ -59,8 +59,8 @@ public sealed record QueryableFilterToGenerate(
             ?? throw new InvalidOperationException("INTERNAL ERROR: Missing named symbol.");
 
         return new QueryableFilterToGenerate(
-            EntityModel.FromSymbol(symbol, 0),
-            EntityModel.FromSyntax(semanticModel, filterClass, 0)
+            EntityModel.FromSyntax(semanticModel, filterClass, 0),
+            EntityModel.FromSymbol(symbol, 0)
         );
     }
 }

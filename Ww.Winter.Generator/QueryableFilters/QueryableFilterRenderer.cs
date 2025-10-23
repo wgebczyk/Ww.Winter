@@ -35,6 +35,11 @@ public static class QueryableFilterRenderer
         sb.AppendLine();
         sb.AppendLine($"namespace {filter.Type.Namespace};");
         sb.AppendLine();
+        foreach (var parentType in filter.Type.ParentTypes)
+        {
+            sb.AppendLine($"partial class {parentType}");
+            sb.AppendLine($"{{");
+        }
         sb.AppendLine($"public partial class {filter.Type.Name}");
         sb.AppendLine($"{{");
 
@@ -89,6 +94,10 @@ public static class QueryableFilterRenderer
         sb.AppendLine();
 
         sb.AppendLine($"}}");
+        foreach (var parentType in filter.Type.ParentTypes)
+        {
+            sb.AppendLine($"}}");
+        }
 
         var content = sb.ToString();
 

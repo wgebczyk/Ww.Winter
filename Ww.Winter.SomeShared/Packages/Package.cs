@@ -1,4 +1,4 @@
-﻿namespace Ww.Winter.Some.Packages;
+﻿namespace Ww.Winter.Some;
 
 public class Package
 {

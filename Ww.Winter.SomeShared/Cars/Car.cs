@@ -1,4 +1,4 @@
-﻿namespace Ww.Winter.Some.Cars;
+﻿namespace Ww.Winter.Some;
 
 public class Car
 {

@@ -57,7 +57,7 @@ public class QueryFilterDebugging
                 MetadataReference.CreateFromFile(AppDomain.CurrentDomain.GetAssemblies().Single(a => a.GetName().Name == "System.Runtime").Location),
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(QueryFilterAttribute).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(Ww.Winter.Some.Books.Book).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(Ww.Winter.Some.Book).Assembly.Location),
             ],
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );

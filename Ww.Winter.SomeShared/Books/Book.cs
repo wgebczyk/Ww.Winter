@@ -1,4 +1,4 @@
-﻿namespace Ww.Winter.Some.Books;
+﻿namespace Ww.Winter.Some;
 
 public class Book
 {
