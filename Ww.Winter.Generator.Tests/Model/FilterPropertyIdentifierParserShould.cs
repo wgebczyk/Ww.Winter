@@ -42,7 +42,7 @@ public sealed class FilterPropertyIdentifierParserShould
     private static EntityModel CreateBasicEntityModel()
     {
         return new EntityModel(
-            new TypeModel("SomeNamespace", "BasicEntity", "SomeNamespace.BasicEntity", []),
+            new TypeModel("SomeNamespace", "BasicEntity", "SomeNamespace.BasicEntity", false, []),
             [
                 new PropertyModel("FirstName", new PropertyTypeModel("String", false, null)),
                 new PropertyModel("LastName", new PropertyTypeModel("String", false, null)),

@@ -12,8 +12,8 @@ public sealed class QueryableFilterIncrementalGenerator : IIncrementalGenerator
     {
         IncrementalValuesProvider<QueryableFilterToGenerate> toGenerate = context.SyntaxProvider
             .ForAttributeWithMetadataName(QueryableFilterAttribute.FullTypeName,
-                predicate: (node, _) => node is ClassDeclarationSyntax,
-                transform: (cxt, _) => QueryableFilterToGenerate.Create(cxt.SemanticModel, (ClassDeclarationSyntax)cxt.TargetNode)
+                predicate: (node, _) => node is ClassDeclarationSyntax or RecordDeclarationSyntax,
+                transform: (cxt, _) => QueryableFilterToGenerate.Create(cxt.SemanticModel, (TypeDeclarationSyntax)cxt.TargetNode)
             );
 
         context.RegisterSourceOutput(toGenerate, ExecuteQuery);

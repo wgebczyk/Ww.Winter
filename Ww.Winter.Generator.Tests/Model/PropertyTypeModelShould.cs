@@ -56,7 +56,7 @@ public sealed class PropertyTypeModelShould
         );
 
         entityModel.Should().BeEquivalentTo(new EntityModel(
-            new TypeModel("SomeNamespace", "SomeType", "SomeNamespace.SomeType", []),
+            new TypeModel("SomeNamespace", "SomeType", "SomeNamespace.SomeType", false, []),
             [
                 new PropertyModel("SomeString", new PropertyTypeModel("string", false, null)),
                 new PropertyModel("SomeChar", new PropertyTypeModel("char", false, null)),
@@ -126,7 +126,7 @@ public sealed class PropertyTypeModelShould
         );
 
         entityModel.Should().BeEquivalentTo(new EntityModel(
-            new TypeModel("SomeNamespace", "SomeType", "SomeNamespace.SomeType", []),
+            new TypeModel("SomeNamespace", "SomeType", "SomeNamespace.SomeType", false, []),
             [
                 new PropertyModel("SomeString", new PropertyTypeModel("string", false, null)),
                 new PropertyModel("SomeChar", new PropertyTypeModel("char", false, null)),

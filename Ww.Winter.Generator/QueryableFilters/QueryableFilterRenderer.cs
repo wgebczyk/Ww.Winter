@@ -26,10 +26,10 @@ public sealed class QueryableFilterRenderer: SourceRenderer
         WriteLine();
         foreach (var parentType in filter.Type.ParentTypes)
         {
-            WriteLine($"partial class {parentType}");
+            WriteLine($"partial {(parentType.IsRecord ? "record" : "class")} {parentType.Name}");
             WriteOpenBracket();
         }
-        WriteLine($"public partial class {filter.Type.Name}");
+        WriteLine($"partial {(toGenerate.Filter.Type.IsRecord ? "record" : "class")} {filter.Type.Name}");
         WriteOpenBracket();
 
         WriteLine($"public IQueryable<{entity.Type.Name}> ApplyFilter(IQueryable<{entity.Type.Name}> query)");
@@ -81,7 +81,7 @@ public sealed class QueryableFilterRenderer: SourceRenderer
         WriteLine($"return query;");
         WriteCloseBracket();
         WriteCloseBracket();
-        foreach (var parentType in filter.Type.ParentTypes)
+        foreach (var _ in filter.Type.ParentTypes)
         {
             WriteCloseBracket();
         }
@@ -93,7 +93,7 @@ public sealed class QueryableFilterRenderer: SourceRenderer
         renderer.RenderCore(toGenerate);
         var content = renderer.GetSource();
 
-        var filename = Helpers.ToSafeFileName(toGenerate.Entity.Type.FullyQualifiedName, "QueryableFilters");
+        var filename = Helpers.ToSafeFileName(toGenerate.Filter.Type.FullyQualifiedName, "QueryableFilters");
         return (content, filename);
     }
 }

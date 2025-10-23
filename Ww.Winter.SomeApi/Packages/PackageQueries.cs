@@ -11,7 +11,8 @@ public partial class PackageQueries
         this.dbContext = dbContext;
     }
 
-    public sealed record QueryPackagesFilter
+    [QueryableFilter(typeof(Package))]
+    public sealed partial record QueryPackagesFilter
     {
         public int? Id { get; init; }
         public string? Number { get; init; }
@@ -31,7 +32,8 @@ public partial class PackageQueries
     //    CancellationToken cancellationToken
     //);
 
-    public sealed record QueryRecipientPackagesFilter
+    [QueryableFilter(typeof(Package))]
+    public sealed partial record QueryRecipientPackagesFilter
     {
         [FromQuery(Name = "name")]
         public string? RecipientNameFragment { get; init; }

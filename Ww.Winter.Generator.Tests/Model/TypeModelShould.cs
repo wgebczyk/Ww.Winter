@@ -85,7 +85,7 @@ public sealed class TypeModelShould
         typeModel.Namespace.Should().Be(expectedNamespace);
         typeModel.Name.Should().Be(expectedName);
         typeModel.FullyQualifiedName.Should().Be(expectedFullyQualifiedName);
-        typeModel.ParentTypes.Should().BeEquivalentTo(expectedParentTypes);
+        typeModel.ParentTypes.Should().BeEquivalentTo(expectedParentTypes.Select(x => new TypeNameModel(x, true)));
     }
 
     [Fact]
@@ -136,8 +136,8 @@ public sealed class TypeModelShould
         var typeModel2 = TypeModel.FromAttributeArgument(sematicModel, attributeSyntax, 1);
         var typeModel3 = TypeModel.FromAttributeArgument(sematicModel, attributeSyntax, 2);
 
-        typeModel1.Should().BeEquivalentTo(new TypeModel("System", "Int32", "System.Int32", []));
-        typeModel2.Should().BeEquivalentTo(new TypeModel("System", "String", "System.String", []));
-        typeModel3.Should().BeEquivalentTo(new TypeModel("SomeNamespace", "SomeTypeOfAttribute", "SomeNamespace.SomeTypeOfAttribute", []));
+        typeModel1.Should().BeEquivalentTo(new TypeModel("System", "Int32", "System.Int32", false, []));
+        typeModel2.Should().BeEquivalentTo(new TypeModel("System", "String", "System.String", false, []));
+        typeModel3.Should().BeEquivalentTo(new TypeModel("SomeNamespace", "SomeTypeOfAttribute", "SomeNamespace.SomeTypeOfAttribute", false, []));
     }
 }

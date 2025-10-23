@@ -9,7 +9,8 @@ public partial class CarQueries
         this.dbContext = dbContext;
     }
 
-    public sealed record QueryCarsFilter
+    [QueryableFilter(typeof(Car))]
+    public sealed partial record QueryCarsFilter
     {
         public string? ManufacturerPrefix { get; init; }
         public string? ManufacturerFragment { get; init; }

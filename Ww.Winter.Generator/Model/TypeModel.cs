@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq.Expressions;
+using System.Linq;
 
 namespace Ww.Winter.Generator.Model;
 
@@ -12,7 +12,8 @@ public record TypeModel(
     string Namespace,
     string Name,
     string FullyQualifiedName,
-    ImmutableArray<string> ParentTypes
+    bool IsRecord,
+    ImmutableArray<TypeNameModel> ParentTypes
 )
 {
     public static TypeModel FromSyntax(PredefinedTypeSyntax syntax)
@@ -69,12 +70,12 @@ public record TypeModel(
             throw new InvalidOperationException($"INTERNAL ERROR: Unsupported PredefinedTypeSyntax {syntax}");
         }
 
-        return new TypeModel("System", name, "System." + name, []);
+        return new TypeModel("System", name, "System." + name, false, []);
     }
 
     public static TypeModel FromSyntax(BaseTypeDeclarationSyntax syntax)
     {
-        var parentTypes = new List<string>(1);
+        var parentTypes = new List<TypeNameModel>(1);
         var parentNamespaces = new List<string>(2);
 
         SyntaxNode? node = syntax.Parent;
@@ -83,7 +84,7 @@ public record TypeModel(
             if (node is BaseTypeDeclarationSyntax cSyntax)
             {
                 var identifier = cSyntax.Identifier.ToString();
-                parentTypes.Add(identifier);
+                parentTypes.Add(new TypeNameModel(identifier, cSyntax is RecordDeclarationSyntax));
             }
             else if (node is BaseNamespaceDeclarationSyntax nsSyntax)
             {
@@ -97,28 +98,30 @@ public record TypeModel(
 
         var name = syntax.Identifier.ToString();
         var ns = string.Join(".", parentNamespaces);
-        string[] allParts = [.. parentNamespaces, .. parentTypes, name];
+        string[] allParts = [.. parentNamespaces, .. parentTypes.Select(x => x.Name), name];
         var fullyQualifiedName = string.Join(".", allParts);
-        return new TypeModel(ns, name, fullyQualifiedName, [.. parentTypes]);
+        var isRecord = syntax is RecordDeclarationSyntax;
+        return new TypeModel(ns, name, fullyQualifiedName, isRecord,[.. parentTypes]);
     }
 
     public static TypeModel FromSymbol(ITypeSymbol symbol)
     {
-        var parentTypes = new List<string>(1);
+        var parentTypes = new List<TypeNameModel>(1);
 
         INamedTypeSymbol? node = symbol.ContainingType;
         while (node is not null)
         {
-            parentTypes.Add(node.Name);
+            parentTypes.Add(new TypeNameModel(node.Name, node.TypeKind == TypeKind.Class && node.IsRecord));
             node = node.ContainingType;
         }
         parentTypes.Reverse();
 
-        var name = string.Join(".", [..parentTypes, symbol.Name]);
+        var name = string.Join(".", [..parentTypes.Select(x => x.Name), symbol.Name]);
         var ns = symbol.ContainingNamespace.ToDisplayString();
         string[] allParts = [ns, name];
         var fullyQualifiedName = string.Join(".", allParts);
-        return new TypeModel(ns, name, fullyQualifiedName, [.. parentTypes]);
+        var isRecord = symbol.TypeKind == TypeKind.Class && symbol.IsRecord;
+        return new TypeModel(ns, name, fullyQualifiedName, isRecord, [.. parentTypes]);
     }
 
     public static TypeModel FromAttributeArgument(
