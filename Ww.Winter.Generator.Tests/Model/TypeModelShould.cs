@@ -87,4 +87,57 @@ public sealed class TypeModelShould
         typeModel.FullyQualifiedName.Should().Be(expectedFullyQualifiedName);
         typeModel.ParentTypes.Should().BeEquivalentTo(expectedParentTypes);
     }
+
+    [Fact]
+    public void ExtractInfoFromAttributeTypeOf()
+    {
+        var syntaxTree = CSharpSyntaxTree.ParseText(
+            """
+            using System;
+
+            namespace SomeNamespace;
+
+            [AttributeUsage(AttributeTargets.Class)]
+            public class SomeTypeOfAttribute: Attribute {
+                public Type Type1 { get; }
+                public Type Type2 { get; }
+                public Type Type3 { get; }
+                public SomeTypeOfAttribute(Type type1, Type type2, Type type3) {
+                    Type1 = type1;
+                    Type2 = type2;
+                    Type3 = type3;
+                }
+            }
+
+            [SomeTypeOf(typeof(int), typeof(String), typeof(SomeTypeOfAttribute))]
+            public class SomeClass {}
+            """
+        );
+        CSharpCompilation compilation = CSharpCompilation.Create(
+            assemblyName: "Ww.Winter.Generator.Tests.Model",
+            syntaxTrees: [syntaxTree],
+            references: [
+                MetadataReference.CreateFromFile(AppDomain.CurrentDomain.GetAssemblies().Single(a => a.GetName().Name == "netstandard").Location),
+                MetadataReference.CreateFromFile(AppDomain.CurrentDomain.GetAssemblies().Single(a => a.GetName().Name == "System.Runtime").Location),
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+            ],
+            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+        );
+
+        var diagnostics = compilation.GetDiagnostics();
+        diagnostics.Should().BeEmpty();
+
+        var sematicModel = compilation.GetSemanticModel(syntaxTree);
+
+        var classSyntax = syntaxTree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Single(x => x.Identifier.ValueText == "SomeClass");
+        var attributeSyntax = classSyntax.AttributeLists.Single().Attributes.Single();
+
+        var typeModel1 = TypeModel.FromAttributeArgument(sematicModel, attributeSyntax, 0);
+        var typeModel2 = TypeModel.FromAttributeArgument(sematicModel, attributeSyntax, 1);
+        var typeModel3 = TypeModel.FromAttributeArgument(sematicModel, attributeSyntax, 2);
+
+        typeModel1.Should().BeEquivalentTo(new TypeModel("System", "Int32", "System.Int32", []));
+        typeModel2.Should().BeEquivalentTo(new TypeModel("System", "String", "System.String", []));
+        typeModel3.Should().BeEquivalentTo(new TypeModel("SomeNamespace", "SomeTypeOfAttribute", "SomeNamespace.SomeTypeOfAttribute", []));
+    }
 }

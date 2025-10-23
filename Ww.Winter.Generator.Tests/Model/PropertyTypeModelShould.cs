@@ -50,28 +50,28 @@ public sealed class PropertyTypeModelShould
         diagnostics.Should().BeEmpty();
 
         var entityModel = EntityModel.FromSyntax(
-            syntaxTree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Single(x => x.Identifier.ValueText == "SomeType"),
             sematicModel,
+            syntaxTree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Single(x => x.Identifier.ValueText == "SomeType"),
             1
         );
 
         entityModel.Should().BeEquivalentTo(new EntityModel(
             new TypeModel("SomeNamespace", "SomeType", "SomeNamespace.SomeType", []),
             [
-                new PropertyModel("SomeString", new PropertyTypeModel("string", null)),
-                new PropertyModel("SomeChar", new PropertyTypeModel("char", null)),
-                new PropertyModel("SomeBoolean", new PropertyTypeModel("bool", null)),
-                new PropertyModel("SomeByte", new PropertyTypeModel("byte", null)),
-                new PropertyModel("SomeSByte", new PropertyTypeModel("sbyte", null)),
-                new PropertyModel("SomeInt16", new PropertyTypeModel("short", null)),
-                new PropertyModel("SomeUInt16", new PropertyTypeModel("ushort", null)),
-                new PropertyModel("SomeInt32", new PropertyTypeModel("int", null)),
-                new PropertyModel("SomeUInt32", new PropertyTypeModel("uint", null)),
-                new PropertyModel("SomeInt64", new PropertyTypeModel("long", null)),
-                new PropertyModel("SomeUInt64", new PropertyTypeModel("ulong", null)),
-                new PropertyModel("SomeDecimal", new PropertyTypeModel("decimal", null)),
-                new PropertyModel("SomeSingle", new PropertyTypeModel("float", null)),
-                new PropertyModel("SomeDouble", new PropertyTypeModel("double", null)),
+                new PropertyModel("SomeString", new PropertyTypeModel("string", false, null)),
+                new PropertyModel("SomeChar", new PropertyTypeModel("char", false, null)),
+                new PropertyModel("SomeBoolean", new PropertyTypeModel("bool", false, null)),
+                new PropertyModel("SomeByte", new PropertyTypeModel("byte", false, null)),
+                new PropertyModel("SomeSByte", new PropertyTypeModel("sbyte", false, null)),
+                new PropertyModel("SomeInt16", new PropertyTypeModel("short", false, null)),
+                new PropertyModel("SomeUInt16", new PropertyTypeModel("ushort", false, null)),
+                new PropertyModel("SomeInt32", new PropertyTypeModel("int", false, null)),
+                new PropertyModel("SomeUInt32", new PropertyTypeModel("uint", false, null)),
+                new PropertyModel("SomeInt64", new PropertyTypeModel("long", false, null)),
+                new PropertyModel("SomeUInt64", new PropertyTypeModel("ulong", false, null)),
+                new PropertyModel("SomeDecimal", new PropertyTypeModel("decimal", false, null)),
+                new PropertyModel("SomeSingle", new PropertyTypeModel("float", false, null)),
+                new PropertyModel("SomeDouble", new PropertyTypeModel("double", false, null)),
             ]
         ));
     }
@@ -120,29 +120,29 @@ public sealed class PropertyTypeModelShould
         diagnostics.Should().BeEmpty();
 
         var entityModel = EntityModel.FromSyntax(
-            syntaxTree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Single(x => x.Identifier.ValueText == "SomeType"),
             sematicModel,
+            syntaxTree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Single(x => x.Identifier.ValueText == "SomeType"),
             1
         );
 
         entityModel.Should().BeEquivalentTo(new EntityModel(
             new TypeModel("SomeNamespace", "SomeType", "SomeNamespace.SomeType", []),
             [
-                new PropertyModel("SomeString", new PropertyTypeModel("string", null)),
-                new PropertyModel("SomeChar", new PropertyTypeModel("char", null)),
-                new PropertyModel("SomeDateTime", new PropertyTypeModel("DateTime", null)),
-                new PropertyModel("SomeBoolean", new PropertyTypeModel("bool", null)),
-                new PropertyModel("SomeByte", new PropertyTypeModel("byte", null)),
-                new PropertyModel("SomeSByte", new PropertyTypeModel("sbyte", null)),
-                new PropertyModel("SomeInt16", new PropertyTypeModel("short", null)),
-                new PropertyModel("SomeUInt16", new PropertyTypeModel("ushort", null)),
-                new PropertyModel("SomeInt32", new PropertyTypeModel("int", null)),
-                new PropertyModel("SomeUInt32", new PropertyTypeModel("uint", null)),
-                new PropertyModel("SomeInt64", new PropertyTypeModel("long", null)),
-                new PropertyModel("SomeUInt64", new PropertyTypeModel("ulong", null)),
-                new PropertyModel("SomeDecimal", new PropertyTypeModel("decimal", null)),
-                new PropertyModel("SomeSingle", new PropertyTypeModel("float", null)),
-                new PropertyModel("SomeDouble", new PropertyTypeModel("double", null)),
+                new PropertyModel("SomeString", new PropertyTypeModel("string", false, null)),
+                new PropertyModel("SomeChar", new PropertyTypeModel("char", false, null)),
+                new PropertyModel("SomeDateTime", new PropertyTypeModel("DateTime", false, null)),
+                new PropertyModel("SomeBoolean", new PropertyTypeModel("bool", false, null)),
+                new PropertyModel("SomeByte", new PropertyTypeModel("byte", false, null)),
+                new PropertyModel("SomeSByte", new PropertyTypeModel("sbyte", false, null)),
+                new PropertyModel("SomeInt16", new PropertyTypeModel("short", false, null)),
+                new PropertyModel("SomeUInt16", new PropertyTypeModel("ushort", false, null)),
+                new PropertyModel("SomeInt32", new PropertyTypeModel("int", false, null)),
+                new PropertyModel("SomeUInt32", new PropertyTypeModel("uint", false, null)),
+                new PropertyModel("SomeInt64", new PropertyTypeModel("long", false, null)),
+                new PropertyModel("SomeUInt64", new PropertyTypeModel("ulong", false, null)),
+                new PropertyModel("SomeDecimal", new PropertyTypeModel("decimal", false, null)),
+                new PropertyModel("SomeSingle", new PropertyTypeModel("float", false, null)),
+                new PropertyModel("SomeDouble", new PropertyTypeModel("double", false, null)),
             ]
         ));
     }

@@ -10,7 +10,7 @@ public record EntityModel(
     ImmutableArray<PropertyModel> Properties
 )
 {
-    public static EntityModel FromSyntax(BaseTypeDeclarationSyntax syntax, SemanticModel semanticModel, int maxDepth)
+    public static EntityModel FromSyntax(SemanticModel semanticModel, BaseTypeDeclarationSyntax syntax, int maxDepth)
     {
         var type = TypeModel.FromSyntax(syntax);
         var properties = syntax.ChildNodes().OfType<PropertyDeclarationSyntax>().Select(x => PropertyModel.FromSyntax(x, semanticModel, maxDepth)).ToImmutableArray();
@@ -18,7 +18,7 @@ public record EntityModel(
         return new EntityModel(type, properties);
     }
 
-    internal static EntityModel FromSymbol(ITypeSymbol symbol, int maxDepth)
+    public static EntityModel FromSymbol(ITypeSymbol symbol, int maxDepth)
     {
         var type = TypeModel.FromSymbol(symbol);
         var properties = symbol.GetMembers().OfType<IPropertySymbol>().Select(x => PropertyModel.FromSymbol(x, maxDepth)).ToImmutableArray();

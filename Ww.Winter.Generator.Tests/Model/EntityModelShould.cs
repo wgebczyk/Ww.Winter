@@ -58,30 +58,30 @@ public sealed class EntityModelShould
         diagnostics.Should().BeEmpty();
 
         var entityModel = EntityModel.FromSyntax(
-            syntaxTree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Single(x => x.Identifier.ValueText == "SomeType"),
             sematicModel,
+            syntaxTree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Single(x => x.Identifier.ValueText == "SomeType"),
             2
         );
 
         entityModel.Should().BeEquivalentTo(new EntityModel(
             new TypeModel("SomeNamespace.Nested", "SomeType", "SomeNamespace.Nested.SomeType", []),
             [
-                new PropertyModel("SomeString", new PropertyTypeModel("string", null)),
-                new PropertyModel("SomeInt", new PropertyTypeModel("int", null)),
-                new PropertyModel("SomeBool", new PropertyTypeModel("bool", null)),
-                new PropertyModel("Other", new PropertyTypeModel("OtherType", new EntityModel(
+                new PropertyModel("SomeString", new PropertyTypeModel("string", false, null)),
+                new PropertyModel("SomeInt", new PropertyTypeModel("int", false, null)),
+                new PropertyModel("SomeBool", new PropertyTypeModel("bool", false, null)),
+                new PropertyModel("Other", new PropertyTypeModel("OtherType", false, new EntityModel(
                     new TypeModel("SomeNamespace.Nested", "OtherType", "SomeNamespace.Nested.OtherType", []),
                     [
-                        new PropertyModel("OtherString", new PropertyTypeModel("string", null)),
-                        new PropertyModel("OtherInt", new PropertyTypeModel("int", null)),
-                        new PropertyModel("OtherBool", new PropertyTypeModel("bool", null)),
-                        new PropertyModel("Foreign", new PropertyTypeModel("ForeignType", new EntityModel(
+                        new PropertyModel("OtherString", new PropertyTypeModel("string", false, null)),
+                        new PropertyModel("OtherInt", new PropertyTypeModel("int", false, null)),
+                        new PropertyModel("OtherBool", new PropertyTypeModel("bool", false, null)),
+                        new PropertyModel("Foreign", new PropertyTypeModel("ForeignType", false, new EntityModel(
                             new TypeModel("SomeNamespace.Nested", "ForeignType", "SomeNamespace.Nested.ForeignType", []),
                             [
-                                new PropertyModel("ForeignString", new PropertyTypeModel("string", null)),
-                                new PropertyModel("ForeignInt", new PropertyTypeModel("int", null)),
-                                new PropertyModel("ForeignBool", new PropertyTypeModel("bool", null)),
-                                new PropertyModel("Ignored", new PropertyTypeModel("IgnoredType", null)),
+                                new PropertyModel("ForeignString", new PropertyTypeModel("string", false, null)),
+                                new PropertyModel("ForeignInt", new PropertyTypeModel("int", false, null)),
+                                new PropertyModel("ForeignBool", new PropertyTypeModel("bool", false, null)),
+                                new PropertyModel("Ignored", new PropertyTypeModel("IgnoredType", false, null)),
                             ]
                         )))
                     ]
@@ -137,24 +137,24 @@ public sealed class EntityModelShould
         diagnostics.Should().BeEmpty();
 
         var entityModel = EntityModel.FromSyntax(
-            syntaxTree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Single(x => x.Identifier.ValueText == "SomeType"),
             sematicModel,
+            syntaxTree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Single(x => x.Identifier.ValueText == "SomeType"),
             2
         );
 
         entityModel.Should().BeEquivalentTo(new EntityModel(
             new TypeModel("SomeNamespace.Nested", "SomeType", "SomeNamespace.Nested.SomeType", []),
             [
-                new PropertyModel("SomeInt", new PropertyTypeModel("int", null)),
-                new PropertyModel("Other", new PropertyTypeModel("SomeType.OtherType", new EntityModel(
+                new PropertyModel("SomeInt", new PropertyTypeModel("int", false, null)),
+                new PropertyModel("Other", new PropertyTypeModel("SomeType.OtherType", false, new EntityModel(
                     new TypeModel("SomeNamespace.Nested", "SomeType.OtherType", "SomeNamespace.Nested.SomeType.OtherType", ["SomeType"]),
                     [
-                        new PropertyModel("OtherInt", new PropertyTypeModel("int", null)),
-                        new PropertyModel("Foreign", new PropertyTypeModel("SomeType.OtherType.ForeignType", new EntityModel(
+                        new PropertyModel("OtherInt", new PropertyTypeModel("int", false, null)),
+                        new PropertyModel("Foreign", new PropertyTypeModel("SomeType.OtherType.ForeignType", false, new EntityModel(
                             new TypeModel("SomeNamespace.Nested", "SomeType.OtherType.ForeignType", "SomeNamespace.Nested.SomeType.OtherType.ForeignType", ["SomeType", "OtherType"]),
                             [
-                                new PropertyModel("ForeignInt", new PropertyTypeModel("int", null)),
-                                new PropertyModel("Ignored", new PropertyTypeModel("IgnoredType", null)),
+                                new PropertyModel("ForeignInt", new PropertyTypeModel("int", false, null)),
+                                new PropertyModel("Ignored", new PropertyTypeModel("IgnoredType", false, null)),
                             ]
                         )))
                     ]

@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
+using Ww.Winter.Generator.Model;
 
 namespace Ww.Winter.Generator.QueryableFilters;
 
@@ -18,6 +20,7 @@ public static class QueryableFilterRenderer
     {
         var filter = toGenerate.Filter;
         var entity = toGenerate.Entity;
+        var propertyParser = new FilterPropertyIdentifierParser();
 
         var sb = new StringBuilder(4 * 1024);
         foreach (var header in Header)
@@ -26,57 +29,56 @@ public static class QueryableFilterRenderer
         }
         sb.AppendLine();
         sb.AppendLine($"using System.Linq;");
-        sb.AppendLine($"using {entity.Namespace};");
+        sb.AppendLine($"using {entity.Type.Namespace};");
         sb.AppendLine();
         sb.AppendLine($"#nullable enable");
         sb.AppendLine();
-        sb.AppendLine($"namespace {filter.Namespace};");
+        sb.AppendLine($"namespace {filter.Type.Namespace};");
         sb.AppendLine();
-        sb.AppendLine($"public partial class {filter.TypeName}");
+        sb.AppendLine($"public partial class {filter.Type.Name}");
         sb.AppendLine($"{{");
 
-        sb.AppendLine($"    public IQueryable<{entity.TypeName}> ApplyFilter(IQueryable<{entity.TypeName}> query)");
+        sb.AppendLine($"    public IQueryable<{entity.Type.Name}> ApplyFilter(IQueryable<{entity.Type.Name}> query)");
         sb.AppendLine($"    {{");
         foreach (var property in filter.Properties)
         {
-            var filterProperty = new QueryableFilterPropertyIdentifierParser().Parse(entity, property);
-            if (filterProperty is null)
+            if (!propertyParser.TryParse(entity, property.Name, out var filterProperty))
             {
-                sb.AppendLine($"        // WARN: Unable to process filter property '{property.PropertyName}' for entity '{entity.TypeName}'");
+                sb.AppendLine($"        // WARN: Unable to process filter property '{property.Name}' for entity '{entity.Type.Name}'");
                 continue;
             }
-            var entityProperty = filterProperty.Property.PropertyName;
+            var entityProperty = filterProperty.Properties.Single().Name;
 
-            sb.AppendLine($"        if (this.{property.PropertyName} is not null)");
+            sb.AppendLine($"        if (this.{property.Name} is not null)");
             sb.AppendLine($"        {{");
             switch (filterProperty!.Comparison)
             {
                 case FilterComparison.Equals:
-                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty} == this.{property.PropertyName});");
+                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty} == this.{property.Name});");
                     break;
                 case FilterComparison.NotEquals:
-                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty} != this.{property.PropertyName});");
+                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty} != this.{property.Name});");
                     break;
                 case FilterComparison.GreaterThan:
-                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty} > this.{property.PropertyName});");
+                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty} > this.{property.Name});");
                     break;
                 case FilterComparison.GreaterThanOrEqual:
-                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty} >= this.{property.PropertyName});");
+                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty} >= this.{property.Name});");
                     break;
                 case FilterComparison.LessThan:
-                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty} < this.{property.PropertyName});");
+                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty} < this.{property.Name});");
                     break;
                 case FilterComparison.LessThanOrEqual:
-                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty} <= this.{property.PropertyName});");
+                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty} <= this.{property.Name});");
                     break;
                 case FilterComparison.Contains:
-                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty}.Contains(this.{property.PropertyName}));");
+                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty}.Contains(this.{property.Name}));");
                     break;
                 case FilterComparison.StartsWith:
-                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty}.StartsWith(this.{property.PropertyName}));");
+                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty}.StartsWith(this.{property.Name}));");
                     break;
                 case FilterComparison.EndsWith:
-                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty}.EndsWith(this.{property.PropertyName}));");
+                    sb.AppendLine($"            query = query.Where(e => e.{entityProperty}.EndsWith(this.{property.Name}));");
                     break;
             }
             sb.AppendLine($"        }}");
@@ -90,7 +92,7 @@ public static class QueryableFilterRenderer
 
         var content = sb.ToString();
 
-        var filename = Helpers.ToSafeFileName(entity.FullyQualifiedTypeName, "QueryableFilters");
+        var filename = Helpers.ToSafeFileName(entity.Type.FullyQualifiedName, "QueryableFilters");
         return (content, filename);
     }
 }

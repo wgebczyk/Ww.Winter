@@ -18,7 +18,7 @@ public record PropertyModel(
         }
         return new PropertyModel(
             syntax.Identifier.ValueText,
-            PropertyTypeModel.FromSyntax(typeSyntax, semanticModel, maxDepth)
+            PropertyTypeModel.FromSyntax(semanticModel, typeSyntax, maxDepth)
         );
     }
 

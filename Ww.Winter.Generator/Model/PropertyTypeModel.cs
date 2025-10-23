@@ -7,13 +7,19 @@ namespace Ww.Winter.Generator.Model;
 
 public record PropertyTypeModel(
     string Name,
+    bool IsNullable,
     EntityModel? Entity
 )
 {
     public bool IsSimple => Entity is null;
 
-    public static PropertyTypeModel FromSyntax(TypeSyntax syntax, SemanticModel semanticModel, int maxDepth)
+    public static PropertyTypeModel FromSyntax(SemanticModel semanticModel, TypeSyntax syntax, int maxDepth)
     {
+        if (syntax is NullableTypeSyntax nullableType)
+        {
+            var element = FromSyntax(semanticModel, nullableType.ElementType, maxDepth);
+            return element with { IsNullable = true };
+        }
         if (syntax is PredefinedTypeSyntax predefinedType)
         {
             return FromSyntaxCore(predefinedType);
@@ -34,16 +40,16 @@ public record PropertyTypeModel(
 
         if (maxDepth == 0)
         {
-            return new PropertyTypeModel(Name: symbol.Name, Entity: null);
+            return new PropertyTypeModel(Name: symbol.Name, IsNullable: false, Entity: null);
         }
 
         var entity = EntityModel.FromSymbol(symbol, maxDepth - 1);
-        return new PropertyTypeModel(Name: entity.Type.Name, Entity: entity);
+        return new PropertyTypeModel(Name: entity.Type.Name, IsNullable: false, Entity: entity);
     }
 
     private static PropertyTypeModel FromSyntaxCore(PredefinedTypeSyntax syntax)
     {
-        return new PropertyTypeModel(Name: syntax.ToString(), Entity: null);
+        return new PropertyTypeModel(Name: syntax.ToString(), IsNullable: false, Entity: null);
     }
     private static PropertyTypeModel FromSyntaxCore(NameSyntax syntax, SemanticModel semanticModel, int maxDepth)
     {
@@ -111,7 +117,7 @@ public record PropertyTypeModel(
         }
         if (name is not null)
         {
-            model = new PropertyTypeModel(Name: name, Entity: null);
+            model = new PropertyTypeModel(Name: name, IsNullable: false, Entity: null);
             return true;
         }
 
