@@ -2,9 +2,7 @@
 
 namespace Ww.Winter;
 
-public sealed class NotFoundEntityException : Exception
+public sealed class NotFoundEntityException(string entityName, string context)
+    : Exception($"Entity '{entityName}' not found due to {context}")
 {
-    public NotFoundEntityException(string entityName, string context) : base($"Entity '{entityName}' not found due to {context}")
-    {
-    }
 }

@@ -5,16 +5,11 @@ using System.ComponentModel;
 namespace Ww.Winter;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public sealed class QueryAttribute: Attribute
+public sealed class QueryAttribute(Type entityType) : Attribute
 {
     public const string FullTypeName = "Ww.Winter.QueryAttribute";
 
-    public Type EntityType { get; }
-
-    public QueryAttribute(Type entityType)
-    {
-        EntityType = entityType;
-    }
+    public Type EntityType { get; } = entityType;
 }
 
 public sealed record SortProperty(

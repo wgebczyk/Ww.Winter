@@ -22,7 +22,7 @@ public sealed class BasicQueryDebugging
             public string LastName { get; set; }
         }
 
-        [BasicQuery(typeof(Person), ""GetPersonByFirstNameOrLastName"")]
+        [BasicQuery(typeof(Person), ""GetPersonByFirstNameOrLastName"", UseBaseQuery = ""BaseQuery"")]
         [BasicQuery(typeof(Person), ""GetPersonByFirstNameAndLastName"")]
         public partial class PersonQueries
         {

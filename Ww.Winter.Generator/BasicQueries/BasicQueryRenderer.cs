@@ -42,9 +42,17 @@ public sealed class BasicQueryRenderer : SourceRenderer
             }
             WriteLine("        CancellationToken cancellationToken)");
             WriteLine("    {");
-            WriteLine($"        var query = this.dbContext.{query.Entity.Type.Name}s");
-            WriteLine($"            .AsNoTracking()");
-            WriteLine($"            .TagWith(\"{query.MethodName}\");");
+            if (query.UseBaseQuery is not null)
+            {
+                WriteLine($"        var query = query.UseBaseQuery()");
+                WriteLine($"            .TagWith(\"{query.MethodName}\");");
+            }
+            else
+            {
+                WriteLine($"        var query = this.dbContext.{query.Entity.Type.Name}s");
+                WriteLine($"            .AsNoTracking()");
+                WriteLine($"            .TagWith(\"{query.MethodName}\");");
+            }
             WriteLine();
             foreach (var filterProperty in entityQuery.FilterProperties)
             {
