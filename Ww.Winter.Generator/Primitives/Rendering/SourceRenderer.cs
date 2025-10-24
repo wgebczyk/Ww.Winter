@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace Ww.Winter.Generator.Rendering;
+namespace Ww.Winter.Generator.Primitives;
 
 public abstract class SourceRenderer
 {
@@ -63,5 +63,13 @@ public abstract class SourceRenderer
     protected void WriteCloseBracket()
     {
         _writer.WriteLine($"{Indentation[--_indentLevel]}}}");
+    }
+
+    protected static string ToSafeFileName(string typeName, string generatorName)
+    {
+        return $"{typeName}_{generatorName}.g.cs".Replace('<', '_')
+            .Replace('>', '_')
+            .Replace(',', '.')
+            .Replace(' ', '_');
     }
 }

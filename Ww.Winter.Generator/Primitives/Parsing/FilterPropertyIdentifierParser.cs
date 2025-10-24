@@ -1,9 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Ww.Winter.Generator.Model;
 
-namespace Ww.Winter.Generator.Parsing;
+namespace Ww.Winter.Generator.Primitives;
 
 public sealed class FilterPropertyIdentifierParser
 {

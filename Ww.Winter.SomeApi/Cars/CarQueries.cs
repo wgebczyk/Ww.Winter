@@ -21,11 +21,11 @@ public partial class CarQueries
         public string? Vin { get; init; }
         public string? VinPrefix { get; init; }
     }
-    //[Query(typeof(Car))]
-    //public partial Task<IList<Car>> QueryCars(
-    //    QueryCarsFilter filter,
-    //    SortParams sort,
-    //    PaginationParams pagination,
-    //    CancellationToken cancellationToken
-    //);
+    [Query(typeof(Car))]
+    public partial Task<IList<Car>> QueryCars(
+        QueryCarsFilter filter,
+        SortParams sort,
+        PaginationParams pagination,
+        CancellationToken cancellationToken
+    );
 }

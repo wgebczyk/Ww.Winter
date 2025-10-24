@@ -12,8 +12,8 @@ public sealed class QueryFilterIncrementalGenerator : IIncrementalGenerator
     {
         IncrementalValuesProvider<QueryFilterToGenerate> toGenerate = context.SyntaxProvider
             .ForAttributeWithMetadataName(QueryFilterAttribute.FullTypeName,
-                predicate: (node, _) => node is ClassDeclarationSyntax,
-                transform: (cxt, _) => GetQueryFilter(cxt)
+                predicate: (node, _) => node is ClassDeclarationSyntax or RecordDeclarationSyntax,
+                transform: (cxt, _) => QueryFilterToGenerate.Create(cxt.SemanticModel, (TypeDeclarationSyntax)cxt.TargetNode)
             );
 
         context.RegisterSourceOutput(toGenerate, ExecuteQuery);
@@ -23,11 +23,5 @@ public sealed class QueryFilterIncrementalGenerator : IIncrementalGenerator
     {
         var (result, filename) = QueryFilterRenderer.Render(toGenerate);
         context.AddSource(filename, SourceText.From(result, Encoding.UTF8));
-    }
-
-    private static QueryFilterToGenerate GetQueryFilter(GeneratorAttributeSyntaxContext context)
-    {
-        var ownedBy = (ClassDeclarationSyntax)context.TargetNode;
-        return QueryFilterToGenerate.Create(context.SemanticModel, ownedBy);
     }
 }

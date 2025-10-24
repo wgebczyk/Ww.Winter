@@ -1,8 +1,7 @@
 ﻿using FluentAssertions;
-using Ww.Winter.Generator.Model;
-using Ww.Winter.Generator.Parsing;
+using Ww.Winter.Generator.Primitives;
 
-namespace Ww.Winter.Generator.Tests.Model;
+namespace Ww.Winter.Generator.Tests.Primitives.Model;
 
 public sealed class FilterPropertyIdentifierParserShould
 {

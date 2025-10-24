@@ -1,7 +1,5 @@
 ﻿using System.Linq;
-using Ww.Winter.Generator.Model;
-using Ww.Winter.Generator.Parsing;
-using Ww.Winter.Generator.Rendering;
+using Ww.Winter.Generator.Primitives;
 
 namespace Ww.Winter.Generator.QueryableFilters;
 
@@ -93,7 +91,7 @@ public sealed class QueryableFilterRenderer: SourceRenderer
         renderer.RenderCore(toGenerate);
         var content = renderer.GetSource();
 
-        var filename = Helpers.ToSafeFileName(toGenerate.Filter.Type.FullyQualifiedName, "QueryableFilters");
+        var filename = ToSafeFileName(toGenerate.Filter.Type.FullyQualifiedName, "QueryableFilters");
         return (content, filename);
     }
 }

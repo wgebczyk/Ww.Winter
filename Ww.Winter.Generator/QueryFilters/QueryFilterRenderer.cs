@@ -1,7 +1,5 @@
 ﻿using System.Linq;
-using Ww.Winter.Generator.Model;
-using Ww.Winter.Generator.Parsing;
-using Ww.Winter.Generator.Rendering;
+using Ww.Winter.Generator.Primitives;
 
 namespace Ww.Winter.Generator.QueryFilters;
 
@@ -40,11 +38,6 @@ public sealed class QueryFilterRenderer : SourceRenderer
             foreach (var property in queryFilter.Filter.Properties)
             {
                 if (!propertyParser.TryParse(queryFilter.Entity, property.Name, out var filterProperty))
-                {
-                    WriteLine($"// WARN: Unable to process filter property '{property.Name}' for entity '{queryFilter.Entity.Type.Name}'");
-                    continue;
-                }
-                if (filterProperty is null)
                 {
                     WriteLine($"// WARN: Unable to process filter property '{property.Name}' for entity '{queryFilter.Entity.Type.Name}'");
                     continue;
@@ -102,7 +95,7 @@ public sealed class QueryFilterRenderer : SourceRenderer
         renderer.RenderCore(toGenerate);
         var content = renderer.GetSource();
 
-        var filename = Helpers.ToSafeFileName(toGenerate.OwnedBy.FullyQualifiedName, "QueryFilters");
+        var filename = ToSafeFileName(toGenerate.OwnedBy.FullyQualifiedName, "QueryFilters");
         return (content, filename);
     }
 }

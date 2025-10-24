@@ -17,23 +17,21 @@ public static class PackageRoutes
         [AsParameters] PackageQueries.QueryPackagesFilter filterParams,
         [AsParameters] SortParams sortParams,
         [AsParameters] PaginationParams paginationParams,
-        [FromServices] PackageQueries carQueries,
+        [FromServices] PackageQueries packageQueries,
         CancellationToken cancellationToken
     )
     {
-        //return await carQueries.QueryPackages(filterParams, sortParams, paginationParams, cancellationToken);
-        throw new InvalidOperationException();
+        return await packageQueries.QueryPackages(filterParams, sortParams, paginationParams, cancellationToken);
     }
 
     private static async Task<IList<Package>> QueryRecipientFilter(
         [AsParameters] PackageQueries.QueryRecipientPackagesFilter filterParams,
         [AsParameters] SortParams sortParams,
         [AsParameters] PaginationParams paginationParams,
-        [FromServices] PackageQueries carQueries,
+        [FromServices] PackageQueries packageQueries,
         CancellationToken cancellationToken
     )
     {
-        //return await carQueries.QueryRecipientPackages(filterParams, sortParams, paginationParams, cancellationToken);
-        throw new InvalidOperationException();
+        return await packageQueries.QueryRecipientPackages(filterParams, sortParams, paginationParams, cancellationToken);
     }
 }

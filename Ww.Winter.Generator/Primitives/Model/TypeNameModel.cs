@@ -1,4 +1,4 @@
-﻿namespace Ww.Winter.Generator.Model;
+﻿namespace Ww.Winter.Generator.Primitives;
 
 public record TypeNameModel(
     string Name,

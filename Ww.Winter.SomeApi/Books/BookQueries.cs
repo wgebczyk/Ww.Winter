@@ -20,11 +20,11 @@ public partial class BookQueries
         public int? PageCountFrom { get; init; }
         public int? PageCountTo { get; init; }
     }
-    //[Query(typeof(Book))]
-    //public partial Task<IList<Book>> QueryBooks(
-    //    QueryBooksFilter filter,
-    //    SortParams sort,
-    //    PaginationParams pagination,
-    //    CancellationToken cancellationToken
-    //);
+    [Query(typeof(Book))]
+    public partial Task<IList<Book>> QueryBooks(
+        QueryBooksFilter filter,
+        SortParams sort,
+        PaginationParams pagination,
+        CancellationToken cancellationToken
+    );
 }

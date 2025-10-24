@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Linq;
-using Ww.Winter.Generator.Model;
+using Ww.Winter.Generator.Primitives;
 
 namespace Ww.Winter.Generator.QueryableFilters;
 
@@ -11,11 +11,11 @@ public sealed record QueryableFilterToGenerate(
     EntityModel Filter
 )
 {
-    public static QueryableFilterToGenerate Create(SemanticModel semanticModel, TypeDeclarationSyntax filterClass)
+    public static QueryableFilterToGenerate Create(SemanticModel semanticModel, TypeDeclarationSyntax filterSyntax)
     {
         AttributeSyntax? attribute = null;
 
-        foreach (var a in filterClass.AttributeLists.SelectMany(x => x.Attributes))
+        foreach (var a in filterSyntax.AttributeLists.SelectMany(x => x.Attributes))
         {
             // do as much as possible syntax checks first for performance
             string name;
@@ -59,8 +59,8 @@ public sealed record QueryableFilterToGenerate(
             ?? throw new InvalidOperationException("INTERNAL ERROR: Missing named symbol.");
 
         return new QueryableFilterToGenerate(
-            EntityModel.FromSymbol(symbol, 0),
-            EntityModel.FromSyntax(semanticModel, filterClass, 0)
+            Entity: EntityModel.FromSymbol(symbol, 0),
+            Filter: EntityModel.FromSyntax(semanticModel, filterSyntax, 0)
         );
     }
 }

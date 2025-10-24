@@ -2,9 +2,9 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Ww.Winter.Generator.Model;
+using Ww.Winter.Generator.Primitives;
 
-namespace Ww.Winter.Generator.Tests.Model;
+namespace Ww.Winter.Generator.Tests.Primitives.Model;
 
 public sealed class EntityModelShould
 {

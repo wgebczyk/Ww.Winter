@@ -20,7 +20,6 @@ public static class CarRoutes
         CancellationToken cancellationToken
     )
     {
-        //return await carQueries.QueryCars(filterParams, sortParams, paginationParams, cancellationToken);
-        throw new InvalidOperationException();
+        return await carQueries.QueryCars(filterParams, sortParams, paginationParams, cancellationToken);
     }
 }

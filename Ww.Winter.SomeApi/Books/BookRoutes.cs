@@ -20,8 +20,7 @@ public static class BookRoutes
         CancellationToken cancellationToken
     )
     {
-        //return await bookQueries.GetBookByIsbn(isbn, cancellationToken);
-        throw new InvalidOperationException();
+        return await bookQueries.GetBookByIsbn(isbn, cancellationToken);
     }
     private static async Task<Book> QueryBookByTitle(
         [FromRoute] string title,
@@ -29,8 +28,7 @@ public static class BookRoutes
         CancellationToken cancellationToken
     )
     {
-        //return await bookQueries.GetBookByTitle(title, cancellationToken);
-        throw new InvalidOperationException();
+        return await bookQueries.GetBookByTitle(title, cancellationToken);
     }
 
     private static async Task<IList<Book>> QueryBookFilter(
@@ -41,7 +39,6 @@ public static class BookRoutes
         CancellationToken cancellationToken
     )
     {
-        //return await bookQueries.QueryBooks(filterParams, sortParams, paginationParams, cancellationToken);
-        throw new InvalidOperationException();
+        return await bookQueries.QueryBooks(filterParams, sortParams, paginationParams, cancellationToken);
     }
 }

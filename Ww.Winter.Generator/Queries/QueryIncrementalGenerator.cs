@@ -14,12 +14,12 @@ public sealed class QueryIncrementalGenerator : IIncrementalGenerator
         IncrementalValuesProvider<QueryToGenerate> queriesToGenerate = context.SyntaxProvider
             .ForAttributeWithMetadataName(QueryAttribute.FullTypeName,
                 predicate: (node, _) => node is MethodDeclarationSyntax,
-                transform: (cxt, _) => GetQuery(cxt)
+                transform: (cxt, _) => Query.CreateQueryElements(cxt.SemanticModel, (MethodDeclarationSyntax)cxt.TargetNode)
             )
             .Collect()
             .SelectMany((x, _) =>
-                x.GroupBy(y => y.Item1.FullyQualifiedTypeName)
-                .Select(y => QueryToGenerate.Create(y.First().Item1, y.Select(x => x.Item2).ToArray()))
+                x.GroupBy(y => y.Item1, y => y.Item2)
+                .Select(y => new QueryToGenerate(y.Key, [.. y]))
             );
 
         context.RegisterSourceOutput(queriesToGenerate, ExecuteQuery);
@@ -29,14 +29,5 @@ public sealed class QueryIncrementalGenerator : IIncrementalGenerator
     {
         var (result, filename) = QueryRenderer.Render(queryToGenerate);
         context.AddSource(filename, SourceText.From(result, Encoding.UTF8));
-    }
-
-    private static (QueryEntity, Query) GetQuery(GeneratorAttributeSyntaxContext context)
-    {
-        var method = (MethodDeclarationSyntax)context.TargetNode;
-        var ownedBy = (ClassDeclarationSyntax)method.Parent!;
-        var ownedByType = Query.GetSymbol(context.SemanticModel.Compilation, Query.GetName(ownedBy));
-        var attribute = method.AttributeLists.SelectMany(x => x.Attributes).Single();
-        return (QueryEntity.FromSymbol(ownedByType), Query.Create(context.SemanticModel.Compilation, attribute, method));
     }
 }

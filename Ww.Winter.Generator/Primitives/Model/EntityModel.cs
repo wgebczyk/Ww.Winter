@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace Ww.Winter.Generator.Model;
+namespace Ww.Winter.Generator.Primitives;
 
 public record EntityModel(
     TypeModel Type,

@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 
-namespace Ww.Winter.Generator.Model;
+namespace Ww.Winter.Generator.Primitives;
 
 public record PropertyModel(
     string Name,

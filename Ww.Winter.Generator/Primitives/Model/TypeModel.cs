@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace Ww.Winter.Generator.Model;
+namespace Ww.Winter.Generator.Primitives;
 
 public record TypeModel(
     string Namespace,

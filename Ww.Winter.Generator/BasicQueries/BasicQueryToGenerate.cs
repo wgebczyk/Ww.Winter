@@ -6,16 +6,16 @@ using System.Collections.Immutable;
 using System.Linq;
 using Ww.Winter.Generator.Primitives;
 
-namespace Ww.Winter.Generator.QueryFilters;
+namespace Ww.Winter.Generator.BasicQueries;
 
-public sealed record QueryFilterToGenerate(
+public record BasicQueryToGenerate(
     TypeModel OwnedBy,
-    ImmutableArray<QueryFilter> QueryFilters
+    ImmutableArray<BasicQuery> Queries
 )
 {
-    public static QueryFilterToGenerate Create(SemanticModel semanticModel, TypeDeclarationSyntax ownedBySyntax)
+    public static BasicQueryToGenerate Create(SemanticModel semanticModel, TypeDeclarationSyntax ownedBySyntax)
     {
-        var queryFilters = new List<QueryFilter>();
+        var queries = new List<BasicQuery>();
         foreach (var attribute in ownedBySyntax.AttributeLists.SelectMany(x => x.Attributes))
         {
             // do as much as possible syntax checks first for performance
@@ -33,16 +33,17 @@ public sealed record QueryFilterToGenerate(
             {
                 throw new InvalidOperationException($"INTERNAL ERROR: Unknown attribute name syntax: '{nameSyntax.GetType().Name}'.");
             }
-            if (name != "QueryFilter" && name != "QueryFilterAttribute")
+            if (name != "BasicQuery" && name != "BasicQueryAttribute")
             {
                 continue;
             }
 
-            queryFilters.Add(QueryFilter.Create(semanticModel, attribute));
+            queries.Add(BasicQuery.Create(semanticModel, attribute));
         }
-        return new QueryFilterToGenerate(
+
+        return new BasicQueryToGenerate(
             OwnedBy: TypeModel.FromSyntax(ownedBySyntax),
-            QueryFilters: [.. queryFilters]
+            Queries: [..queries]
         );
     }
 }

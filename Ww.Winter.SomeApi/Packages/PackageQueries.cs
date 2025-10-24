@@ -24,13 +24,13 @@ public partial class PackageQueries
         public string? RecipientPostalCode { get; init; }
         public string? RecipientPostalCodePrefix { get; init; }
     }
-    //[Query(typeof(Package))]
-    //public partial Task<IList<Package>> QueryPackages(
-    //    QueryPackagesFilter filter,
-    //    SortParams sort,
-    //    PaginationParams pagination,
-    //    CancellationToken cancellationToken
-    //);
+    [Query(typeof(Package))]
+    public partial Task<IList<Package>> QueryPackages(
+        QueryPackagesFilter filter,
+        SortParams sort,
+        PaginationParams pagination,
+        CancellationToken cancellationToken
+    );
 
     [QueryableFilter(typeof(Package))]
     public sealed partial record QueryRecipientPackagesFilter
@@ -44,11 +44,11 @@ public partial class PackageQueries
         [FromQuery(Name = "posta-code-starts-with")]
         public string? RecipientPostalCodePrefix { get; init; }
     }
-    //[Query(typeof(Package))]
-    //public partial Task<IList<Package>> QueryRecipientPackages(
-    //    QueryRecipientPackagesFilter filter,
-    //    SortParams sort,
-    //    PaginationParams pagination,
-    //    CancellationToken cancellationToken
-    //);
+    [Query(typeof(Package))]
+    public partial Task<IList<Package>> QueryRecipientPackages(
+        QueryRecipientPackagesFilter filter,
+        SortParams sort,
+        PaginationParams pagination,
+        CancellationToken cancellationToken
+    );
 }

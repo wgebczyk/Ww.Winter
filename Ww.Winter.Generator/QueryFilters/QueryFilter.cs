@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
-using Ww.Winter.Generator.Model;
+using Ww.Winter.Generator.Primitives;
 
 namespace Ww.Winter.Generator.QueryFilters;
 
