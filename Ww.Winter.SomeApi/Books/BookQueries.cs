@@ -19,6 +19,7 @@ public partial class BookQueries
         public string? CategoryFragment { get; init; }
         public int? PageCountFrom { get; init; }
         public int? PageCountTo { get; init; }
+        public bool OnlySpecialFlag { get; init; }
     }
     [Query(typeof(Book))]
     public partial Task<IList<Book>> QueryBooks(
@@ -27,4 +28,13 @@ public partial class BookQueries
         PaginationParams pagination,
         CancellationToken cancellationToken
     );
+
+    private static IQueryable<Book> ApplyOnlySpecialFlag(IQueryable<Book> query, bool value)
+    {
+        if (!value)
+        {
+            return query;
+        }
+        return query.Where(b => b.Category == "Special");
+    }
 }

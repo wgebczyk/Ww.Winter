@@ -5,5 +5,6 @@ namespace Ww.Winter.Generator.Queries;
 
 public sealed record QueryToGenerate(
     TypeModel OwnedBy,
+    ImmutableHashSet<string> OwnedByMethods,
     ImmutableArray<Query> Queries
 );

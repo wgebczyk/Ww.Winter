@@ -82,11 +82,11 @@ public sealed class EntityModelShould
                                 new PropertyModel("ForeignInt", new PropertyTypeModel("int", false, null)),
                                 new PropertyModel("ForeignBool", new PropertyTypeModel("bool", false, null)),
                                 new PropertyModel("Ignored", new PropertyTypeModel("IgnoredType", false, null)),
-                            ]
+                            ], []
                         )))
-                    ]
+                    ], []
                 )))
-            ]
+            ], []
         ));
     }
     [Fact]
@@ -155,11 +155,11 @@ public sealed class EntityModelShould
                             [
                                 new PropertyModel("ForeignInt", new PropertyTypeModel("int", false, null)),
                                 new PropertyModel("Ignored", new PropertyTypeModel("IgnoredType", false, null)),
-                            ]
+                            ], []
                         )))
-                    ]
+                    ], []
                 )))
-            ]
+            ], []
         ));
     }
 }

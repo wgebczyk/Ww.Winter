@@ -18,8 +18,8 @@ public sealed class QueryIncrementalGenerator : IIncrementalGenerator
             )
             .Collect()
             .SelectMany((x, _) =>
-                x.GroupBy(y => y.Item1, y => y.Item2)
-                .Select(y => new QueryToGenerate(y.Key, [.. y]))
+                x.GroupBy(y => y.Item1)
+                .Select(y => new QueryToGenerate(y.Key, y.First().Item2, [.. y.Select(z => z.Item3)]))
             );
 
         context.RegisterSourceOutput(queriesToGenerate, ExecuteQuery);

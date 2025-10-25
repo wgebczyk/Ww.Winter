@@ -72,7 +72,7 @@ public sealed class PropertyTypeModelShould
                 new PropertyModel("SomeDecimal", new PropertyTypeModel("decimal", false, null)),
                 new PropertyModel("SomeSingle", new PropertyTypeModel("float", false, null)),
                 new PropertyModel("SomeDouble", new PropertyTypeModel("double", false, null)),
-            ]
+            ], []
         ));
     }
     [Fact]
@@ -143,7 +143,7 @@ public sealed class PropertyTypeModelShould
                 new PropertyModel("SomeDecimal", new PropertyTypeModel("decimal", false, null)),
                 new PropertyModel("SomeSingle", new PropertyTypeModel("float", false, null)),
                 new PropertyModel("SomeDouble", new PropertyTypeModel("double", false, null)),
-            ]
+            ], []
         ));
     }
 }

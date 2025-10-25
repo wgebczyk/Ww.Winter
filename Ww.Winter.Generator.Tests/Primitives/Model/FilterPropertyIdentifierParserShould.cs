@@ -46,7 +46,7 @@ public sealed class FilterPropertyIdentifierParserShould
                 new PropertyModel("FirstName", new PropertyTypeModel("String", false, null)),
                 new PropertyModel("LastName", new PropertyTypeModel("String", false, null)),
                 new PropertyModel("AddressCount", new PropertyTypeModel("Int32", false, null)),
-            ]
+            ], []
         );
     }
 }

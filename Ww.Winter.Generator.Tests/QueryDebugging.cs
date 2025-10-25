@@ -68,6 +68,7 @@ public class QueryDebugging
                 public int? YearTo { get; init; }
                 public string? Vin { get; init; }
                 public string? VinPrefix { get; init; }
+                public bool OnlySpecialFlag { get; init; }
             }
             [Query(typeof(Car))]
             public partial Task<IList<Car>> QueryCars(
@@ -76,6 +77,11 @@ public class QueryDebugging
                 PaginationParams pagination,
                 CancellationToken cancellationToken
             );
+
+            private IQueryable<Book> ApplyOnlySpecialFlag(IQueryable<Book> query, bool value) {
+                if (!value) { return query; }
+                return query.Where(b => b.Color == ""Special"");
+            }
         }
 
         public partial class PackageQueries

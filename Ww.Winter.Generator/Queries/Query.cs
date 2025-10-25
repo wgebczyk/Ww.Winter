@@ -16,7 +16,7 @@ public sealed record Query(
     string? PaginationParamName
 )
 {
-    public static (TypeModel, Query) CreateQueryElements(SemanticModel semanticModel, MethodDeclarationSyntax syntax)
+    public static (TypeModel, ImmutableHashSet<string>, Query) CreateQueryElements(SemanticModel semanticModel, MethodDeclarationSyntax syntax)
     {
         var parentSyntax = syntax.Parent;
         if (parentSyntax is not TypeDeclarationSyntax typeDeclarationSyntax)
@@ -25,8 +25,9 @@ public sealed record Query(
         }
 
         var ownedByType = TypeModel.FromSyntax(typeDeclarationSyntax);
+        var ownedByMethods = parentSyntax.ChildNodes().OfType<MethodDeclarationSyntax>().Select(x => x.Identifier.ValueText).ToImmutableHashSet();
         var query = Create(semanticModel, syntax);
-        return (ownedByType, query);
+        return (ownedByType, ownedByMethods, query);
     }
 
     public static Query Create(SemanticModel semanticModel, MethodDeclarationSyntax syntax)

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Ww.Winter.Generator.Primitives;
 
@@ -42,8 +43,16 @@ public sealed class QueryRenderer : SourceRenderer
             WriteLine($"    .AsNoTracking()");
             WriteLine($"    .TagWith(\"{query.MethodName}\");");
             WriteLine();
+
             foreach (var property in query.Filter.Properties)
             {
+                var customApplyMethodName = $"Apply{property.Name}";
+                if (toGenerate.OwnedByMethods.Contains(customApplyMethodName))
+                {
+                    WriteLine($"query = {customApplyMethodName}(query, {filterParamName}.{property.Name});");
+                    continue;
+                }
+
                 if (!propertyParser.TryParse(query.Entity, property.Name, out var filterProperty))
                 {
                     WriteLine($"// WARN: Unable to process filter property '{property.Name}' for entity '{query.Entity.Type.Name}'");
@@ -139,7 +148,7 @@ public sealed class QueryRenderer : SourceRenderer
             WriteLine($"                  : source.OrderBy(keySelector);");
             WriteCloseBracket();
             WriteLine($"return descending ? ordered.ThenByDescending(keySelector)");
-            WriteLine($"              : ordered.ThenBy(keySelector);");
+            WriteLine($"                  : ordered.ThenBy(keySelector);");
             WriteCloseBracket();
             WriteLine();
             WriteLine($"private IQueryable<{entity.Type.Name}> ApplyPagination(IQueryable<{entity.Type.Name}> query, PaginationParams pagination)");
