@@ -47,7 +47,11 @@ public record EntityModel(
     public static EntityModel FromSymbol(ITypeSymbol symbol, int maxDepth)
     {
         var type = TypeModel.FromSymbol(symbol);
-        var properties = symbol.GetMembers().OfType<IPropertySymbol>().Select(x => PropertyModel.FromSymbol(x, maxDepth)).ToImmutableArray();
+        var properties = symbol.GetMembers()
+            .OfType<IPropertySymbol>()
+            .Where(x => !x.IsImplicitlyDeclared)
+            .Select(x => PropertyModel.FromSymbol(x, maxDepth))
+            .ToImmutableArray();
         var methods = symbol.GetMembers()
             .OfType<IMethodSymbol>()
             .Where(x => x.MethodKind == MethodKind.Ordinary)

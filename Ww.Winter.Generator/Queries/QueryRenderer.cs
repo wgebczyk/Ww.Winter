@@ -34,11 +34,8 @@ public sealed class QueryRenderer : SourceRenderer
             var filterParamName = query.FilterParamName;
             var projectToMethodName = $"{query.MethodName}ProjectTo";
             var projectToMethod = toGenerate.OwnedByMethods.SingleOrDefault(x => x.Name == projectToMethodName);
-            var returnType = projectToMethod is not null
-                ? $"IList<{projectToMethod.Type.Name}>"
-                : $"IList<{query.Entity.Type.Name}>";
 
-            WriteLine($"public partial async Task<{returnType}> {query.MethodName}(");
+            WriteLine($"public partial async {query.MethodReturnTypeExpression} {query.MethodName}(");
             WriteLine($"    {query.Filter.Type.Name} {filterParamName},");
             WriteLine($"    SortParams {query.SortParamName},");
             WriteLine($"    PaginationParams {query.PaginationParamName},");

@@ -12,6 +12,7 @@ public sealed record Query(
     EntityModel Entity,
     EntityModel Filter,
     string MethodName,
+    string MethodReturnTypeExpression,
     string FilterParamName,
     string? SortParamName,
     string? PaginationParamName,
@@ -27,19 +28,20 @@ public sealed record Query(
             throw new InvalidOperationException($"INTERNAL ERROR: [Query(...)] attributed method does not belong to type.");
         }
 
+        var query = Create(semanticModel, syntax);
         var ownedByType = TypeModel.FromSyntax(typeDeclarationSyntax);
         var ownedByMethods = parentSyntax.ChildNodes()
             .OfType<MethodDeclarationSyntax>()
             .Where(x => !x.Modifiers.Any(y => y.IsKind(SyntaxKind.PartialKeyword)))
             .Select(x => MethodModel.FromSyntax(semanticModel, x))
             .ToImmutableHashSet();
-        var query = Create(semanticModel, syntax);
         return (ownedByType, ownedByMethods, query);
     }
 
     public static Query Create(SemanticModel semanticModel, MethodDeclarationSyntax syntax)
     {
         var attribute = syntax.AttributeLists.SelectMany(x => x.Attributes).Single();
+        var entity = FromAttributeArgument(semanticModel, attribute, 0);
 
         var parameters = syntax.ParameterList.Parameters;
 
@@ -58,9 +60,10 @@ public sealed record Query(
         var methodName = syntax.Identifier.ValueText;
 
         return new Query(
-            Entity: FromAttributeArgument(semanticModel, attribute, 0),
+            Entity: entity,
             Filter: EntityModel.FromSymbol(filterSymbol, 1),
             MethodName: syntax.Identifier.ValueText,
+            MethodReturnTypeExpression: syntax.ReturnType.ToString(),
             filterParameter.Identifier.ValueText,
             sortParameter.Identifier.ValueText,
             paginationParameter.Identifier.ValueText,
