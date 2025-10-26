@@ -1,21 +1,45 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
 using System.Linq;
 
 namespace Ww.Winter.Generator.Primitives;
 
+public record MethodModel(
+    string Name,
+    TypeModel Type
+)
+{
+    public static MethodModel FromSyntax(SemanticModel semanticModel, MethodDeclarationSyntax syntax)
+    {
+        var returnType = TypeModel.FromSyntax(syntax.ReturnType);
+
+        return new MethodModel(syntax.Identifier.ValueText, returnType);
+    }
+    public static MethodModel FromSymbol(IMethodSymbol symbol)
+    {
+        var returnType = TypeModel.FromSymbol(symbol.ReturnType);
+
+        return new MethodModel(symbol.Name, returnType);
+    }
+}
+
 public record EntityModel(
     TypeModel Type,
     ImmutableArray<PropertyModel> Properties,
-    ImmutableHashSet<string> Methods
+    ImmutableHashSet<MethodModel> Methods
 )
 {
     public static EntityModel FromSyntax(SemanticModel semanticModel, BaseTypeDeclarationSyntax syntax, int maxDepth)
     {
         var type = TypeModel.FromSyntax(syntax);
         var properties = syntax.ChildNodes().OfType<PropertyDeclarationSyntax>().Select(x => PropertyModel.FromSyntax(x, semanticModel, maxDepth)).ToImmutableArray();
-        var methods = syntax.ChildNodes().OfType<MethodDeclarationSyntax>().Select(x => x.Identifier.ValueText).ToImmutableHashSet();
+        var methods = syntax.ChildNodes()
+            .OfType<MethodDeclarationSyntax>()
+            .Where(x => !x.Modifiers.Any(y => y.IsKind(SyntaxKind.PartialKeyword)))
+            .Select(x => MethodModel.FromSyntax(semanticModel, x))
+            .ToImmutableHashSet();
 
         return new EntityModel(type, properties, methods);
     }
@@ -28,7 +52,7 @@ public record EntityModel(
             .OfType<IMethodSymbol>()
             .Where(x => x.MethodKind == MethodKind.Ordinary)
             .Where(x => !x.IsImplicitlyDeclared)
-            .Select(x => x.Name)
+            .Select(MethodModel.FromSymbol)
             .ToImmutableHashSet();
 
         return new EntityModel(type, properties, methods);

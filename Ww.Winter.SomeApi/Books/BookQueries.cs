@@ -1,4 +1,6 @@
-﻿namespace Ww.Winter.Some.Books;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Ww.Winter.Some.Books;
 
 public partial class BookQueries
 {
@@ -28,6 +30,24 @@ public partial class BookQueries
         PaginationParams pagination,
         CancellationToken cancellationToken
     );
+    public sealed record BookSummaryDto(
+        string Title,
+        string Isbn,
+        string AuthorName
+    );
+
+    private IQueryable<Book> GetBaseQuery()
+    {
+        return dbContext.Books.IgnoreQueryFilters();
+    }
+
+    //public BookSummaryDto QueryBooksProjectTo(Book entity) {
+    //    return new BookSummaryDto(
+    //        entity.Title,
+    //        entity.Isbn,
+    //        entity.Author
+    //    );
+    //}
 
     private static IQueryable<Book> ApplyOnlySpecialFlag(IQueryable<Book> query, bool value)
     {

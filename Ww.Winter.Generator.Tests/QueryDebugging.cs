@@ -10,7 +10,7 @@ public class QueryDebugging
     public void DebugIt()
     {
         var source =
-        @"""
+        @"
         using Ww.Winter;
 
         namespace Ww.Winter.Generator.Tests;
@@ -77,7 +77,20 @@ public class QueryDebugging
                 PaginationParams pagination,
                 CancellationToken cancellationToken
             );
+            public sealed record QueryCarsSummaryDto(
+                string Model,
+                string Year
+            );
 
+            private IQueryable<Car> GetBaseQuery() {
+                return dbContext.Cars.IgnoreQueryFilters();
+            }
+            public CarSummaryDto QueryCarsProjectTo(Car entity) {
+                return new CarSummaryDto(
+                    entity.Model,
+                    entity.Year
+                );
+            }
             private IQueryable<Book> ApplyOnlySpecialFlag(IQueryable<Book> query, bool value) {
                 if (!value) { return query; }
                 return query.Where(b => b.Color == ""Special"");
@@ -132,7 +145,7 @@ public class QueryDebugging
                 CancellationToken cancellationToken
             );
         }
-        """;
+        ";
 
         var driver = DriveQuery(source);
         var result = driver.GetRunResult();
@@ -140,13 +153,20 @@ public class QueryDebugging
 
     public static GeneratorDriver DriveQuery(string source)
     {
-        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source);
+        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source, path: "source1.cs");
 
         CSharpCompilation compilation = CSharpCompilation.Create(
             assemblyName: "Ww.Winter.Generator.Tests__",
             syntaxTrees: [syntaxTree],
-            references: [MetadataReference.CreateFromFile(typeof(QueryAttribute).Assembly.Location)]
+            references: [MetadataReference.CreateFromFile(typeof(QueryAttribute).Assembly.Location),
+                MetadataReference.CreateFromFile(AppDomain.CurrentDomain.GetAssemblies().Single(a => a.GetName().Name == "netstandard").Location),
+                MetadataReference.CreateFromFile(AppDomain.CurrentDomain.GetAssemblies().Single(a => a.GetName().Name == "System.Runtime").Location),
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location)
+            ]
         );
+
+        var diagnostics = compilation.GetDiagnostics();
+        //diagnostics.Should().BeEmpty();
 
         var generator = new QueryIncrementalGenerator();
 

@@ -59,7 +59,22 @@ public record BasicQuery(
         {
             return null;
         }
+        if (useBaseQueryArgument.Expression is LiteralExpressionSyntax literalExpression)
+        {
+            return literalExpression.Token.ValueText;
+        }
+        if (useBaseQueryArgument.Expression is InvocationExpressionSyntax invocationExpression)
+        {
+            if (invocationExpression.Expression is IdentifierNameSyntax nameSyntax && nameSyntax.Identifier.ValueText == "nameof")
+            {
+                var firstArgument = invocationExpression.ArgumentList.Arguments.Single();
+                if (firstArgument.Expression is IdentifierNameSyntax argumentIdentifierExpression)
+                {
+                    return argumentIdentifierExpression.Identifier.ValueText;
+                }
+            }
+        }
 
-        return useBaseQueryArgument.Expression.ToString();
+        throw new InvalidOperationException("INTERNAL ERROR: Unsupported attribute value expression.");
     }
 }

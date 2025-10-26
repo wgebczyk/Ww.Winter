@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using Ww.Winter.Generator.Primitives;
 
@@ -33,21 +32,36 @@ public sealed class QueryRenderer : SourceRenderer
         foreach (var query in toGenerate.Queries)
         {
             var filterParamName = query.FilterParamName;
-            WriteLine($"public partial async Task<IList<{query.Entity.Type.Name}>> {query.MethodName}(");
+            var projectToMethodName = $"{query.MethodName}ProjectTo";
+            var projectToMethod = toGenerate.OwnedByMethods.SingleOrDefault(x => x.Name == projectToMethodName);
+            var returnType = projectToMethod is not null
+                ? $"IList<{projectToMethod.Type.Name}>"
+                : $"IList<{query.Entity.Type.Name}>";
+
+            WriteLine($"public partial async Task<{returnType}> {query.MethodName}(");
             WriteLine($"    {query.Filter.Type.Name} {filterParamName},");
             WriteLine($"    SortParams {query.SortParamName},");
             WriteLine($"    PaginationParams {query.PaginationParamName},");
             WriteLine($"    CancellationToken cancellationToken)");
             WriteOpenBracket();
-            WriteLine($"var query = this.dbContext.{query.Entity.Type.Name}s");
-            WriteLine($"    .AsNoTracking()");
-            WriteLine($"    .TagWith(\"{query.MethodName}\");");
+            if (query.UseBaseQuery is not null)
+            {
+                WriteLine($"var query = {query.UseBaseQuery}()");
+                WriteLine($"    .TagWith(\"{query.MethodName}\");");
+            }
+            else
+            {
+                WriteLine($"var query = this.dbContext.{query.Entity.Type.Name}s");
+                WriteLine($"    .AsNoTracking()");
+                WriteLine($"    .TagWith(\"{query.MethodName}\");");
+            }
             WriteLine();
 
             foreach (var property in query.Filter.Properties)
             {
                 var customApplyMethodName = $"Apply{property.Name}";
-                if (toGenerate.OwnedByMethods.Contains(customApplyMethodName))
+                var customApply = toGenerate.OwnedByMethods.SingleOrDefault(x => x.Name == customApplyMethodName);
+                if (customApply is not null)
                 {
                     WriteLine($"query = {customApplyMethodName}(query, {filterParamName}.{property.Name});");
                     continue;
@@ -98,7 +112,18 @@ public sealed class QueryRenderer : SourceRenderer
             WriteLine($"query = ApplySort(query, {query.SortParamName});");
             WriteLine($"query = ApplyPagination(query, {query.PaginationParamName});");
             WriteLine();
-            WriteLine($"return await query.ToListAsync(cancellationToken);");
+
+            if (projectToMethod is not null)
+            {
+                WriteLine($"return await query");
+                WriteLine($"    .Select({projectToMethod.Name})");
+                WriteLine($"    .ToListAsync(cancellationToken);");
+            }
+            else
+            {
+                WriteLine($"return await query.ToListAsync(cancellationToken);");
+            }
+
             WriteCloseBracket();
             WriteLine();
         }

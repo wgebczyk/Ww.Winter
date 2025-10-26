@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Immutable;
@@ -13,10 +14,12 @@ public sealed record Query(
     string MethodName,
     string FilterParamName,
     string? SortParamName,
-    string? PaginationParamName
+    string? PaginationParamName,
+
+    string? UseBaseQuery
 )
 {
-    public static (TypeModel, ImmutableHashSet<string>, Query) CreateQueryElements(SemanticModel semanticModel, MethodDeclarationSyntax syntax)
+    public static (TypeModel, ImmutableHashSet<MethodModel>, Query) CreateQueryElements(SemanticModel semanticModel, MethodDeclarationSyntax syntax)
     {
         var parentSyntax = syntax.Parent;
         if (parentSyntax is not TypeDeclarationSyntax typeDeclarationSyntax)
@@ -25,7 +28,11 @@ public sealed record Query(
         }
 
         var ownedByType = TypeModel.FromSyntax(typeDeclarationSyntax);
-        var ownedByMethods = parentSyntax.ChildNodes().OfType<MethodDeclarationSyntax>().Select(x => x.Identifier.ValueText).ToImmutableHashSet();
+        var ownedByMethods = parentSyntax.ChildNodes()
+            .OfType<MethodDeclarationSyntax>()
+            .Where(x => !x.Modifiers.Any(y => y.IsKind(SyntaxKind.PartialKeyword)))
+            .Select(x => MethodModel.FromSyntax(semanticModel, x))
+            .ToImmutableHashSet();
         var query = Create(semanticModel, syntax);
         return (ownedByType, ownedByMethods, query);
     }
@@ -56,7 +63,8 @@ public sealed record Query(
             MethodName: syntax.Identifier.ValueText,
             filterParameter.Identifier.ValueText,
             sortParameter.Identifier.ValueText,
-            paginationParameter.Identifier.ValueText
+            paginationParameter.Identifier.ValueText,
+            GetUseBaseQueryFromAttribute(attribute)
         );
     }
 
@@ -76,5 +84,34 @@ public sealed record Query(
         var symbol = TypeModel.TryGetNamedTypeSymbol(semanticModel, expression.Type)
             ?? throw new InvalidOperationException("INTERNAL ERROR: Missing named symbol.");
         return EntityModel.FromSymbol(symbol, 0);
+    }
+
+    private static string? GetUseBaseQueryFromAttribute(AttributeSyntax attribute)
+    {
+        var argumentList = attribute.ArgumentList
+            ?? throw new InvalidOperationException("INTERNAL ERROR: Cannot find attribute's argument list.");
+
+        var useBaseQueryArgument = argumentList.Arguments.SingleOrDefault(x => x.NameEquals?.Name.Identifier.ValueText == "UseBaseQuery");
+        if (useBaseQueryArgument is null)
+        {
+            return null;
+        }
+        if (useBaseQueryArgument.Expression is LiteralExpressionSyntax literalExpression)
+        {
+            return literalExpression.Token.ValueText;
+        }
+        if (useBaseQueryArgument.Expression is InvocationExpressionSyntax invocationExpression)
+        {
+            if (invocationExpression.Expression is IdentifierNameSyntax nameSyntax && nameSyntax.Identifier.ValueText == "nameof")
+            {
+                var firstArgument = invocationExpression.ArgumentList.Arguments.Single();
+                if (firstArgument.Expression is IdentifierNameSyntax argumentIdentifierExpression)
+                {
+                    return argumentIdentifierExpression.Identifier.ValueText;
+                }
+            }
+        }
+
+        throw new InvalidOperationException("INTERNAL ERROR: Unsupported attribute value expression.");
     }
 }

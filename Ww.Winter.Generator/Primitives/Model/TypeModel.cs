@@ -72,6 +72,14 @@ public record TypeModel(
 
         return new TypeModel("System", name, "System." + name, false, []);
     }
+    public static TypeModel FromSyntax(TypeSyntax syntax)
+    {
+        if (syntax is PredefinedTypeSyntax predefinedTypeSyntax)
+        {
+            return FromSyntax(predefinedTypeSyntax);
+        }
+        return new TypeModel("", syntax.ToString(), syntax.ToString(), false, []);
+    }
 
     public static TypeModel FromSyntax(BaseTypeDeclarationSyntax syntax)
     {

@@ -10,6 +10,8 @@ public sealed class QueryAttribute(Type entityType) : Attribute
     public const string FullTypeName = "Ww.Winter.QueryAttribute";
 
     public Type EntityType { get; } = entityType;
+
+    public string? UseBaseQuery { get; set; }
 }
 
 public sealed record SortProperty(
