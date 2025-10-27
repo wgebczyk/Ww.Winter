@@ -25,7 +25,7 @@ public sealed record Query(
         var parentSyntax = syntax.Parent;
         if (parentSyntax is not TypeDeclarationSyntax typeDeclarationSyntax)
         {
-            throw new InvalidOperationException($"INTERNAL ERROR: [Query(...)] attributed method does not belong to type.");
+            throw new InvalidOperationException($"[Query(...)] attributed method does not belong to type.");
         }
 
         var query = Create(semanticModel, syntax);
@@ -51,11 +51,11 @@ public sealed record Query(
 
         if (filterParameter.Type is null)
         {
-            throw new InvalidOperationException($"INTERNAL ERROR: Missing named symbol from filter parameter. {filterParameter}.");
+            throw new InvalidOperationException($"Missing named symbol from filter parameter. {filterParameter}.");
         }
 
         var filterSymbol = TypeModel.TryGetNamedTypeSymbol(semanticModel, filterParameter.Type)
-            ?? throw new InvalidOperationException("INTERNAL ERROR: Missing named symbol for parameter type. {filterParameter.Type}");
+            ?? throw new InvalidOperationException("Missing named symbol for parameter type. {filterParameter.Type}");
 
         var methodName = syntax.Identifier.ValueText;
 
@@ -81,18 +81,18 @@ public sealed record Query(
             ?? throw new InvalidOperationException($"Cannot find n-th ({argumentIndex}) typeof(...) argument.");
         if (expression.Type is PredefinedTypeSyntax)
         {
-            throw new InvalidOperationException("INTERNAL ERROR: Predefined type cannot be entity.");
+            throw new InvalidOperationException("Predefined type cannot be entity.");
         }
 
         var symbol = TypeModel.TryGetNamedTypeSymbol(semanticModel, expression.Type)
-            ?? throw new InvalidOperationException("INTERNAL ERROR: Missing named symbol.");
+            ?? throw new InvalidOperationException("Missing named symbol.");
         return EntityModel.FromSymbol(symbol, 0);
     }
 
     private static string? GetUseBaseQueryFromAttribute(AttributeSyntax attribute)
     {
         var argumentList = attribute.ArgumentList
-            ?? throw new InvalidOperationException("INTERNAL ERROR: Cannot find attribute's argument list.");
+            ?? throw new InvalidOperationException("Cannot find attribute's argument list.");
 
         var useBaseQueryArgument = argumentList.Arguments.SingleOrDefault(x => x.NameEquals?.Name.Identifier.ValueText == "UseBaseQuery");
         if (useBaseQueryArgument is null)
@@ -115,6 +115,6 @@ public sealed record Query(
             }
         }
 
-        throw new InvalidOperationException("INTERNAL ERROR: Unsupported attribute value expression.");
+        throw new InvalidOperationException("Unsupported attribute value expression.");
     }
 }

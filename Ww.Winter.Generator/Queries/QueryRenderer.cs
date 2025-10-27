@@ -14,21 +14,14 @@ public sealed class QueryRenderer : SourceRenderer
     {
         var propertyParser = new FilterPropertyIdentifierParser();
 
+        WriteLine($"using System.ComponentModel;");
         WriteLine($"using System.Linq.Expressions;");
         WriteLine($"using Microsoft.EntityFrameworkCore;");
         WriteLine($"using Ww.Winter;");
         WriteLine();
         WriteLine($"#nullable enable");
         WriteLine();
-        WriteLine($"namespace {toGenerate.OwnedBy.Namespace};");
-        WriteLine();
-        foreach (var parentType in toGenerate.OwnedBy.ParentTypes)
-        {
-            WriteLine($"partial {(parentType.IsRecord ? "record" : "class")} {parentType.Name}");
-            WriteOpenBracket();
-        }
-        WriteLine($"partial class {toGenerate.OwnedBy.Name}");
-        WriteOpenBracket();
+        WriteStartClass(toGenerate.OwnedBy);
         foreach (var query in toGenerate.Queries)
         {
             var filterParamName = query.FilterParamName;
@@ -128,6 +121,24 @@ public sealed class QueryRenderer : SourceRenderer
         var generatedEntities = new HashSet<string>();
         foreach (var query in toGenerate.Queries)
         {
+            if (generatedEntities.Count == 0)
+            {
+                WriteLine();
+                WriteLine($"private static IOrderedQueryable<T> ApplySort<T, TKey>(");
+                WriteLine($"    IQueryable<T> source,");
+                WriteLine($"    Expression<Func<T, TKey>> keySelector,");
+                WriteLine($"    bool descending)");
+                WriteOpenBracket();
+                WriteLine($"if (source is not IOrderedQueryable<T> ordered)");
+                WriteOpenBracket();
+                WriteLine($"return descending ? source.OrderByDescending(keySelector)");
+                WriteLine($"                  : source.OrderBy(keySelector);");
+                WriteCloseBracket();
+                WriteLine($"return descending ? ordered.ThenByDescending(keySelector)");
+                WriteLine($"                  : ordered.ThenBy(keySelector);");
+                WriteCloseBracket();
+            }
+
             var entity = query.Entity;
             if (!generatedEntities.Add(entity.Type.FullyQualifiedName))
             {
@@ -151,26 +162,12 @@ public sealed class QueryRenderer : SourceRenderer
             foreach (var entityProperty in entity.Properties)
             {
                 WriteLine($"case \"{entityProperty.Name.ToLowerInvariant()}\":");
-                WriteLine($"    query = ApplySort(query, o => o.{entityProperty.Name}, direction == System.ComponentModel.ListSortDirection.Descending);");
+                WriteLine($"    query = ApplySort(query, o => o.{entityProperty.Name}, direction == ListSortDirection.Descending);");
                 WriteLine($"    break;");
             }
             WriteCloseBracket();
             WriteCloseBracket();
             WriteLine($"return query;");
-            WriteCloseBracket();
-            WriteLine();
-            WriteLine($"private static IOrderedQueryable<T> ApplySort<T, TKey>(");
-            WriteLine($"    IQueryable<T> source,");
-            WriteLine($"    Expression<Func<T, TKey>> keySelector,");
-            WriteLine($"    bool descending)");
-            WriteOpenBracket();
-            WriteLine($"if (source is not IOrderedQueryable<T> ordered)");
-            WriteOpenBracket();
-            WriteLine($"return descending ? source.OrderByDescending(keySelector)");
-            WriteLine($"                  : source.OrderBy(keySelector);");
-            WriteCloseBracket();
-            WriteLine($"return descending ? ordered.ThenByDescending(keySelector)");
-            WriteLine($"                  : ordered.ThenBy(keySelector);");
             WriteCloseBracket();
             WriteLine();
             WriteLine($"private IQueryable<{entity.Type.Name}> ApplyPagination(IQueryable<{entity.Type.Name}> query, PaginationParams pagination)");
@@ -182,11 +179,7 @@ public sealed class QueryRenderer : SourceRenderer
             WriteLine($"return query;");
             WriteCloseBracket();
         }
-        WriteCloseBracket();
-        foreach (var _ in toGenerate.OwnedBy.ParentTypes)
-        {
-            WriteCloseBracket();
-        }
+        WriteEndClass(toGenerate.OwnedBy);
     }
 
     public static (string Content, string HintName) Render(QueryToGenerate toGenerate)

@@ -28,11 +28,11 @@ public sealed record QueryFilter(
             ?? throw new InvalidOperationException($"Cannot find n-th ({argumentIndex}) typeof(...) argument.");
         if (expression.Type is PredefinedTypeSyntax)
         {
-            throw new InvalidOperationException("INTERNAL ERROR: Predefined type cannot be entity.");
+            throw new InvalidOperationException("Predefined type cannot be entity.");
         }
 
         var symbol = TypeModel.TryGetNamedTypeSymbol(semanticModel, expression.Type)
-            ?? throw new InvalidOperationException("INTERNAL ERROR: Missing named symbol.");
+            ?? throw new InvalidOperationException("Missing named symbol.");
         return EntityModel.FromSymbol(symbol, 0);
     }
 }

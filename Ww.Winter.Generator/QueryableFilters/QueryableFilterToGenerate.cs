@@ -30,7 +30,7 @@ public sealed record QueryableFilterToGenerate(
             }
             else
             {
-                throw new InvalidOperationException($"INTERNAL ERROR: Unknown attribute name syntax: '{nameSyntax.GetType().Name}'.");
+                throw new InvalidOperationException($"Unknown attribute name syntax: '{nameSyntax.GetType().Name}'.");
             }
             if (name != "QueryableFilter" && name != "QueryableFilterAttribute")
             {
@@ -39,24 +39,24 @@ public sealed record QueryableFilterToGenerate(
 
             if (attribute is not null)
             {
-                throw new InvalidOperationException("INTERNAL ERROR: Multiple QueryableFilter attributes found on the same entity.");
+                throw new InvalidOperationException("Multiple QueryableFilter attributes found on the same entity.");
             }
             attribute = a;
         }
         if (attribute is null)
         {
-            throw new InvalidOperationException("INTERNAL ERROR: Missing QueryableFilter attribute.");
+            throw new InvalidOperationException("Missing QueryableFilter attribute.");
         }
 
         var expression = TypeModel.TryGetTypeOfExpression(attribute, 0)
             ?? throw new InvalidOperationException($"Cannot find n-th (0) typeof(...) argument.");
         if (expression.Type is PredefinedTypeSyntax)
         {
-            throw new InvalidOperationException("INTERNAL ERROR: Predefined type cannot be entity.");
+            throw new InvalidOperationException("Predefined type cannot be entity.");
         }
 
         var symbol = TypeModel.TryGetNamedTypeSymbol(semanticModel, expression.Type)
-            ?? throw new InvalidOperationException("INTERNAL ERROR: Missing named symbol.");
+            ?? throw new InvalidOperationException("Missing named symbol.");
 
         return new QueryableFilterToGenerate(
             Entity: EntityModel.FromSymbol(symbol, 0),

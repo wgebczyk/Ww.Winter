@@ -31,7 +31,7 @@ public record BasicQueryToGenerate(
             }
             else
             {
-                throw new InvalidOperationException($"INTERNAL ERROR: Unknown attribute name syntax: '{nameSyntax.GetType().Name}'.");
+                throw new InvalidOperationException($"Unknown attribute name syntax: '{nameSyntax.GetType().Name}'.");
             }
             if (name != "BasicQuery" && name != "BasicQueryAttribute")
             {

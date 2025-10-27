@@ -18,15 +18,7 @@ public sealed class QueryFilterRenderer : SourceRenderer
         WriteLine();
         WriteLine($"#nullable enable");
         WriteLine();
-        WriteLine($"namespace {toGenerate.OwnedBy.Namespace};");
-        WriteLine();
-        foreach (var parentType in toGenerate.OwnedBy.ParentTypes)
-        {
-            WriteLine($"partial {(parentType.IsRecord ? "record" : "class")} {parentType.Name}");
-            WriteOpenBracket();
-        }
-        WriteLine($"partial {(toGenerate.OwnedBy.IsRecord ? "record" : "class")} {toGenerate.OwnedBy.Name}");
-        WriteOpenBracket();
+        WriteStartClass(toGenerate.OwnedBy);
         foreach (var queryFilter in toGenerate.QueryFilters)
         {
             var entityName = queryFilter.Entity.Type.Name;
@@ -82,11 +74,7 @@ public sealed class QueryFilterRenderer : SourceRenderer
             WriteLine($"return query;");
             WriteCloseBracket();
         }
-        WriteCloseBracket();
-        foreach (var _ in toGenerate.OwnedBy.ParentTypes)
-        {
-            WriteCloseBracket();
-        }
+        WriteEndClass(toGenerate.OwnedBy);
     }
 
     public static (string Content, string HintName) Render(QueryFilterToGenerate toGenerate)

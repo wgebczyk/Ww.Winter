@@ -67,7 +67,7 @@ public record TypeModel(
         }
         if (name is null)
         {
-            throw new InvalidOperationException($"INTERNAL ERROR: Unsupported PredefinedTypeSyntax {syntax}");
+            throw new InvalidOperationException($"Unsupported PredefinedTypeSyntax {syntax}");
         }
 
         return new TypeModel("System", name, "System." + name, false, []);
@@ -146,7 +146,7 @@ public record TypeModel(
         }
 
         var symbol = TryGetNamedTypeSymbol(semanticModel, expression.Type)
-            ?? throw new InvalidOperationException("INTERNAL ERROR: Missing named symbol.");
+            ?? throw new InvalidOperationException("Missing named symbol.");
 
         return FromSymbol(symbol);
     }
@@ -154,13 +154,13 @@ public record TypeModel(
     public static TypeOfExpressionSyntax? TryGetTypeOfExpression(AttributeSyntax attribute, int argumentIndex)
     {
         var argumentList = attribute.ArgumentList
-            ?? throw new InvalidOperationException("INTERNAL ERROR: Cannot find attribute's argument list.");
+            ?? throw new InvalidOperationException("Cannot find attribute's argument list.");
         if (argumentList.Arguments.Count <= argumentIndex)
         {
-            throw new InvalidOperationException($"INTERNAL ERROR: Cannot find attribute argument at index {argumentIndex}");
+            throw new InvalidOperationException($"Cannot find attribute argument at index {argumentIndex}");
         }
         var argument = argumentList.Arguments[argumentIndex]
-            ?? throw new InvalidOperationException($"INTERNAL ERROR: Cannot find attribute argument at index {argumentIndex}");
+            ?? throw new InvalidOperationException($"Cannot find attribute argument at index {argumentIndex}");
 
         return argument.Expression as TypeOfExpressionSyntax;
     }

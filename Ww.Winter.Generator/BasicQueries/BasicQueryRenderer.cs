@@ -18,15 +18,7 @@ public sealed class BasicQueryRenderer : SourceRenderer
         WriteLine();
         WriteLine($"#nullable enable");
         WriteLine();
-        WriteLine($"namespace {toGenerate.OwnedBy.Namespace};");
-        WriteLine();
-        foreach (var parentType in toGenerate.OwnedBy.ParentTypes)
-        {
-            WriteLine($"partial {(parentType.IsRecord ? "record" : "class")} {parentType.Name}");
-            WriteOpenBracket();
-        }
-        WriteLine($"partial {(toGenerate.OwnedBy.IsRecord ? "record" : "class")} {toGenerate.OwnedBy.Name}");
-        WriteLine("{");
+        WriteStartClass(toGenerate.OwnedBy);
         foreach (var query in toGenerate.Queries)
         {
             if (!queryParser.TryParse(query.Entity, query.MethodName, out var entityQuery))
@@ -34,48 +26,44 @@ public sealed class BasicQueryRenderer : SourceRenderer
                 WriteLine($"// WARN: Unable to process basic query '{query.MethodName}' for entity '{query.Entity.Type.Name}'");
                 continue;
             }
-            WriteLine($"    public async Task<{query.Entity.Type.Name}> {query.MethodName}(");
+            WriteLine($"public async Task<{query.Entity.Type.Name}> {query.MethodName}(");
             foreach (var filterProperty in entityQuery.FilterProperties)
             {
                 var property = filterProperty.Properties.Single();
-                WriteLine($"        {property.Type.Name}? {ToCamelCase(property.Name)},");
+                WriteLine($"{property.Type.Name}? {ToCamelCase(property.Name)},");
             }
-            WriteLine("        CancellationToken cancellationToken)");
-            WriteLine("    {");
+            WriteLine($"CancellationToken cancellationToken)");
+            WriteOpenBracket();
             if (query.UseBaseQuery is not null)
             {
-                WriteLine($"        var query = query.UseBaseQuery()");
-                WriteLine($"            .TagWith(\"{query.MethodName}\");");
+                WriteLine($"var query = query.UseBaseQuery()");
+                WriteLine($"    .TagWith(\"{query.MethodName}\");");
             }
             else
             {
-                WriteLine($"        var query = this.dbContext.{query.Entity.Type.Name}s");
-                WriteLine($"            .AsNoTracking()");
-                WriteLine($"            .TagWith(\"{query.MethodName}\");");
+                WriteLine($"var query = this.dbContext.{query.Entity.Type.Name}s");
+                WriteLine($"    .AsNoTracking()");
+                WriteLine($"    .TagWith(\"{query.MethodName}\");");
             }
             WriteLine();
             foreach (var filterProperty in entityQuery.FilterProperties)
             {
                 var property = filterProperty.Properties.Single();
-                WriteLine($"        if ({ToCamelCase(property.Name)} is not null)");
-                WriteLine("        {");
-                WriteLine($"            query = query.Where(e => e.{property.Name} == {ToCamelCase(property.Name)});");
-                WriteLine("        }");
+                WriteLine($"if ({ToCamelCase(property.Name)} is not null)");
+                WriteOpenBracket();
+                WriteLine($"query = query.Where(e => e.{property.Name} == {ToCamelCase(property.Name)});");
+                WriteCloseBracket();
             }
             WriteLine();
-            WriteLine($"        var result = await query.SingleOrDefaultAsync(cancellationToken);");
-            WriteLine($"        if (result is null)");
-            WriteLine("        {");
-            WriteLine($"            throw new NotFoundEntityException(\"{query.Entity.Type.Name}\", \"Id lookup failure\");");
-            WriteLine("        }");
-            WriteLine($"        return result;");
-            WriteLine("    }");
-        }
-        WriteLine("}");
-        foreach (var _ in toGenerate.OwnedBy.ParentTypes)
-        {
+            WriteLine($"var result = await query.SingleOrDefaultAsync(cancellationToken);");
+            WriteLine($"if (result is null)");
+            WriteOpenBracket();
+            WriteLine($"throw new NotFoundEntityException(\"{query.Entity.Type.Name}\", \"Id lookup failure\");");
+            WriteCloseBracket();
+            WriteLine($"return result;");
             WriteCloseBracket();
         }
+        WriteEndClass(toGenerate.OwnedBy);
     }
     private static string ToCamelCase(string value)
     {

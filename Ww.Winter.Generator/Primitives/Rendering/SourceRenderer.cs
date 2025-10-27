@@ -65,6 +65,28 @@ public abstract class SourceRenderer
         _writer.WriteLine($"{Indentation[--_indentLevel]}}}");
     }
 
+    protected void WriteStartClass(TypeModel ownedBy)
+    {
+        WriteLine($"namespace {ownedBy.Namespace};");
+        WriteLine();
+        foreach (var parentType in ownedBy.ParentTypes)
+        {
+            WriteLine($"partial {(parentType.IsRecord ? "record" : "class")} {parentType.Name}");
+            WriteOpenBracket();
+        }
+        WriteLine($"partial {(ownedBy.IsRecord ? "record" : "class")} {ownedBy.Name}");
+        WriteOpenBracket();
+    }
+
+    protected void WriteEndClass(TypeModel ownedBy)
+    {
+        WriteCloseBracket();
+        foreach (var _ in ownedBy.ParentTypes)
+        {
+            WriteCloseBracket();
+        }
+    }
+
     protected static string ToSafeFileName(string typeName, string generatorName)
     {
         return $"{typeName}_{generatorName}.g.cs".Replace('<', '_')

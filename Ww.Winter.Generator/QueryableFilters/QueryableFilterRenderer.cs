@@ -20,16 +20,7 @@ public sealed class QueryableFilterRenderer: SourceRenderer
         WriteLine();
         WriteLine($"#nullable enable");
         WriteLine();
-        WriteLine($"namespace {filter.Type.Namespace};");
-        WriteLine();
-        foreach (var parentType in filter.Type.ParentTypes)
-        {
-            WriteLine($"partial {(parentType.IsRecord ? "record" : "class")} {parentType.Name}");
-            WriteOpenBracket();
-        }
-        WriteLine($"partial {(toGenerate.Filter.Type.IsRecord ? "record" : "class")} {filter.Type.Name}");
-        WriteOpenBracket();
-
+        WriteStartClass(filter.Type);
         WriteLine($"public IQueryable<{entity.Type.Name}> ApplyFilter(IQueryable<{entity.Type.Name}> query)");
         WriteOpenBracket();
         foreach (var property in filter.Properties)
@@ -78,11 +69,7 @@ public sealed class QueryableFilterRenderer: SourceRenderer
         WriteLine();
         WriteLine($"return query;");
         WriteCloseBracket();
-        WriteCloseBracket();
-        foreach (var _ in filter.Type.ParentTypes)
-        {
-            WriteCloseBracket();
-        }
+        WriteEndClass(filter.Type);
     }
 
     public static (string Content, string HintName) Render(QueryableFilterToGenerate toGenerate)

@@ -26,7 +26,7 @@ public record BasicQuery(
         var arguments = attribute.ArgumentList?.Arguments.ToArray() ?? [];
         if (arguments.Length < 2)
         {
-            throw new InvalidOperationException($"INTERNAL ERROR: Expected at least 2 arguments in [BasicQuery(...)].");
+            throw new InvalidOperationException($"Expected at least 2 arguments in [BasicQuery(...)].");
         }
         var methodNameExpression = arguments[1].Expression;
         if (methodNameExpression is LiteralExpressionSyntax literalSyntax)
@@ -41,18 +41,18 @@ public record BasicQuery(
             ?? throw new InvalidOperationException($"Cannot find n-th (0) typeof(...) argument.");
         if (expression.Type is PredefinedTypeSyntax)
         {
-            throw new InvalidOperationException("INTERNAL ERROR: Predefined type cannot be entity.");
+            throw new InvalidOperationException("Predefined type cannot be entity.");
         }
 
         var symbol = TypeModel.TryGetNamedTypeSymbol(semanticModel, expression.Type)
-            ?? throw new InvalidOperationException("INTERNAL ERROR: Missing named symbol.");
+            ?? throw new InvalidOperationException("Missing named symbol.");
 
         return EntityModel.FromSymbol(symbol, 0);
     }
     private static string? GetUseBaseQueryFromAttribute(AttributeSyntax attribute)
     {
         var argumentList = attribute.ArgumentList
-            ?? throw new InvalidOperationException("INTERNAL ERROR: Cannot find attribute's argument list.");
+            ?? throw new InvalidOperationException("Cannot find attribute's argument list.");
 
         var useBaseQueryArgument = argumentList.Arguments.SingleOrDefault(x => x.NameEquals?.Name.Identifier.ValueText == "UseBaseQuery");
         if (useBaseQueryArgument is null)
@@ -75,6 +75,6 @@ public record BasicQuery(
             }
         }
 
-        throw new InvalidOperationException("INTERNAL ERROR: Unsupported attribute value expression.");
+        throw new InvalidOperationException("Unsupported attribute value expression.");
     }
 }
