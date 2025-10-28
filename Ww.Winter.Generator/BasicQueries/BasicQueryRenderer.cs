@@ -30,9 +30,9 @@ public sealed class BasicQueryRenderer : SourceRenderer
             foreach (var filterProperty in entityQuery.FilterProperties)
             {
                 var property = filterProperty.Properties.Single();
-                WriteLine($"{property.Type.Name}? {ToCamelCase(property.Name)},");
+                WriteLine($"    {property.Type.Name}? {ToCamelCase(property.Name)},");
             }
-            WriteLine($"CancellationToken cancellationToken)");
+            WriteLine($"    CancellationToken cancellationToken)");
             WriteOpenBracket();
             if (query.UseBaseQuery is not null)
             {
