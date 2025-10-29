@@ -34,9 +34,9 @@ public sealed class BasicQueryRenderer : SourceRenderer
             }
             WriteLine($"    CancellationToken cancellationToken)");
             WriteOpenBracket();
-            if (query.UseBaseQuery is not null)
+            if (query.UseBaseQueryExpression is not null)
             {
-                WriteLine($"var query = query.UseBaseQuery()");
+                WriteLine($"var query = {query.UseBaseQueryExpression}");
                 WriteLine($"    .TagWith(\"{query.MethodName}\");");
             }
             else

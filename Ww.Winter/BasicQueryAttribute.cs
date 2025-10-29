@@ -10,5 +10,5 @@ public sealed class BasicQueryAttribute(Type entityType, string queryIdentifier)
     public Type EntityType { get; } = entityType;
     public string QueryIdentifier { get; } = queryIdentifier;
 
-    public string? UseBaseQuery { get; set; }
+    public string? UseBaseQueryExpression { get; set; }
 }

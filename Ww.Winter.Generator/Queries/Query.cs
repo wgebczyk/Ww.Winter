@@ -17,7 +17,7 @@ public sealed record Query(
     string? SortParamName,
     string? PaginationParamName,
 
-    string? UseBaseQuery
+    string? UseBaseQueryExpression
 )
 {
     public static (TypeModel, ImmutableHashSet<MethodModel>, Query) CreateQueryElements(SemanticModel semanticModel, MethodDeclarationSyntax syntax)
@@ -28,7 +28,7 @@ public sealed record Query(
             throw new InvalidOperationException($"[Query(...)] attributed method does not belong to type.");
         }
 
-        var query = Create(semanticModel, syntax);
+        var query = Create(semanticModel, syntax, typeDeclarationSyntax);
         var ownedByType = TypeModel.FromSyntax(typeDeclarationSyntax);
         var ownedByMethods = parentSyntax.ChildNodes()
             .OfType<MethodDeclarationSyntax>()
@@ -38,7 +38,7 @@ public sealed record Query(
         return (ownedByType, ownedByMethods, query);
     }
 
-    public static Query Create(SemanticModel semanticModel, MethodDeclarationSyntax syntax)
+    public static Query Create(SemanticModel semanticModel, MethodDeclarationSyntax syntax, TypeDeclarationSyntax ownedBySyntax)
     {
         var attribute = syntax.AttributeLists.SelectMany(x => x.Attributes).Single();
         var entity = FromAttributeArgument(semanticModel, attribute, 0);
@@ -56,18 +56,21 @@ public sealed record Query(
 
         var filterSymbol = TypeModel.TryGetNamedTypeSymbol(semanticModel, filterParameter.Type)
             ?? throw new InvalidOperationException("Missing named symbol for parameter type. {filterParameter.Type}");
+        var filter = EntityModel.FromSymbol(filterSymbol, 1);
 
-        var methodName = syntax.Identifier.ValueText;
+        var useBaseQueryExpression =
+            GetUseBaseQueryFromAttribute(attribute) ??
+            GetUseBaseQueryFromOwnedBy(semanticModel, ownedBySyntax, entity);
 
         return new Query(
-            Entity: entity,
-            Filter: EntityModel.FromSymbol(filterSymbol, 1),
-            MethodName: syntax.Identifier.ValueText,
-            MethodReturnTypeExpression: syntax.ReturnType.ToString(),
+            entity,
+            filter,
+            syntax.Identifier.ValueText,
+            syntax.ReturnType.ToString(),
             filterParameter.Identifier.ValueText,
             sortParameter.Identifier.ValueText,
             paginationParameter.Identifier.ValueText,
-            GetUseBaseQueryFromAttribute(attribute)
+            useBaseQueryExpression
         );
     }
 
@@ -94,7 +97,7 @@ public sealed record Query(
         var argumentList = attribute.ArgumentList
             ?? throw new InvalidOperationException("Cannot find attribute's argument list.");
 
-        var useBaseQueryArgument = argumentList.Arguments.SingleOrDefault(x => x.NameEquals?.Name.Identifier.ValueText == "UseBaseQuery");
+        var useBaseQueryArgument = argumentList.Arguments.SingleOrDefault(x => x.NameEquals?.Name.Identifier.ValueText == "UseBaseQueryExpression");
         if (useBaseQueryArgument is null)
         {
             return null;
@@ -116,5 +119,47 @@ public sealed record Query(
         }
 
         throw new InvalidOperationException("Unsupported attribute value expression.");
+    }
+
+    private static string? GetUseBaseQueryFromOwnedBy(SemanticModel semanticModel, TypeDeclarationSyntax syntax, EntityModel entity)
+    {
+        foreach (var property in syntax.Members.OfType<PropertyDeclarationSyntax>())
+        {
+            var symbolInfo = semanticModel.GetSymbolInfo(property.Type);
+            if (symbolInfo.Symbol is ITypeSymbol typeSymbol)
+            {
+                var candidateProperty = GetUseBaseQueryFromDbContext(semanticModel, typeSymbol, entity);
+                if (candidateProperty is not null)
+                {
+                    return $"{property.Identifier.ValueText}.{candidateProperty}.AsNoTracking()";
+                }
+            }
+        }
+        foreach (var field in syntax.Members.OfType<FieldDeclarationSyntax>().SelectMany(x => x.Declaration.Variables))
+        {
+            var symbolInfo = semanticModel.GetDeclaredSymbol(field);
+            if (symbolInfo is IFieldSymbol fieldSymbol)
+            {
+                var candidateField = GetUseBaseQueryFromDbContext(semanticModel, fieldSymbol.Type, entity);
+                if (candidateField is not null)
+                {
+                    return $"{field.Identifier.ValueText}.{candidateField}.AsNoTracking()";
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static string? GetUseBaseQueryFromDbContext(SemanticModel semanticModel, ITypeSymbol typeSymbol, EntityModel entity)
+    {
+        var expectedDbSetType = $"Microsoft.EntityFrameworkCore.DbSet<{entity.Type.FullyQualifiedName}>";
+
+        var candidateProperty = typeSymbol.GetMembers().OfType<IPropertySymbol>().FirstOrDefault(x => x.Type.ToString() == expectedDbSetType);
+        if (candidateProperty is not null)
+        {
+            return candidateProperty.Name;
+        }
+        return null;
     }
 }

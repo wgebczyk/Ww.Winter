@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Ww.Winter.Generator.BasicQueries;
 
-namespace Ww.Winter.Generator.Tests.Queries;
+namespace Ww.Winter.Generator.Tests.BasicQueries;
 
 public sealed class BasicQueryIncrementalGeneratorShould
 {
@@ -21,7 +21,7 @@ public sealed class BasicQueryIncrementalGeneratorShould
             public string LastName { get; set; }
         }
 
-        [BasicQuery(typeof(Person), ""GetPersonByFirstNameOrLastName"", UseBaseQuery = ""BaseQuery"")]
+        [BasicQuery(typeof(Person), ""GetPersonByFirstNameOrLastName"", UseBaseQueryExpression = ""BaseQuery()"")]
         [BasicQuery(typeof(Person), ""GetPersonByFirstNameAndLastName"")]
         public partial class PersonQueries
         {
@@ -47,7 +47,7 @@ public sealed class BasicQueryIncrementalGeneratorShould
                     string? lastName,
                     CancellationToken cancellationToken)
                 {
-                    var query = query.UseBaseQuery()
+                    var query = BaseQuery()
                         .TagWith("GetPersonByFirstNameOrLastName");
 
                     if (firstName is not null)

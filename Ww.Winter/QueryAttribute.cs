@@ -11,7 +11,7 @@ public sealed class QueryAttribute(Type entityType) : Attribute
 
     public Type EntityType { get; } = entityType;
 
-    public string? UseBaseQuery { get; set; }
+    public string? UseBaseQueryExpression { get; set; }
 }
 
 public sealed record SortProperty(

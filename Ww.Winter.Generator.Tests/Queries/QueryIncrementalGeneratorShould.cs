@@ -106,8 +106,7 @@ public sealed class QueryIncrementalGeneratorShould
                     PaginationParams pagination,
                     CancellationToken cancellationToken)
                 {
-                    var query = this.dbContext.Cars
-                        .AsNoTracking()
+                    var query = dbContext.Cars.AsNoTracking()
                         .TagWith("QueryCars");
 
                     if (filter.ManufacturerPrefix is not null)

@@ -9,7 +9,7 @@ namespace Ww.Winter.Generator.BasicQueries;
 public record BasicQuery(
     string MethodName,
     EntityModel Entity,
-    string? UseBaseQuery
+    string? UseBaseQueryExpression
 )
 {
     public static BasicQuery Create(SemanticModel semanticModel, AttributeSyntax attribute)
@@ -54,7 +54,7 @@ public record BasicQuery(
         var argumentList = attribute.ArgumentList
             ?? throw new InvalidOperationException("Cannot find attribute's argument list.");
 
-        var useBaseQueryArgument = argumentList.Arguments.SingleOrDefault(x => x.NameEquals?.Name.Identifier.ValueText == "UseBaseQuery");
+        var useBaseQueryArgument = argumentList.Arguments.SingleOrDefault(x => x.NameEquals?.Name.Identifier.ValueText == "UseBaseQueryExpression");
         if (useBaseQueryArgument is null)
         {
             return null;

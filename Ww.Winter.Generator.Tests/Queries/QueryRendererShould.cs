@@ -19,7 +19,7 @@ public sealed class QueryRendererShould
                 "filter",
                 "sort",
                 "pagination",
-                UseBaseQuery: null
+                UseBaseQueryExpression: null
             )]
         ));
 
@@ -63,7 +63,7 @@ public sealed class QueryRendererShould
                 "filter",
                 "sort",
                 "pagination",
-                UseBaseQuery: null
+                UseBaseQueryExpression: null
             )]
         ));
 
@@ -111,7 +111,7 @@ public sealed class QueryRendererShould
     public void RenderQueryClassWithCustomBaseQuery()
     {
         var query = CreateQuery();
-        var (Content, HintName) = QueryRenderer.Render(new QueryToGenerate(CreateOwnedByType(), [], [query with { UseBaseQuery = "GetMyBaseQuery" }]));
+        var (Content, HintName) = QueryRenderer.Render(new QueryToGenerate(CreateOwnedByType(), [], [query with { UseBaseQueryExpression = "GetMyBaseQuery()" }]));
 
         HintName.Should().Be("MyNs.MyQueryClass_Queries.g.cs");
         Content.Should().Contain("var query = GetMyBaseQuery()");
@@ -131,7 +131,7 @@ public sealed class QueryRendererShould
             "filter",
             "sort",
             "pagination",
-            UseBaseQuery: null
+            UseBaseQueryExpression: null
         );
     }
     private static EntityModel CreateEntity()

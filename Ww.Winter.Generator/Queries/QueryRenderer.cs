@@ -34,14 +34,14 @@ public sealed class QueryRenderer : SourceRenderer
             WriteLine($"    PaginationParams {query.PaginationParamName},");
             WriteLine($"    CancellationToken cancellationToken)");
             WriteOpenBracket();
-            if (query.UseBaseQuery is not null)
+            if (query.UseBaseQueryExpression is not null)
             {
-                WriteLine($"var query = {query.UseBaseQuery}()");
+                WriteLine($"var query = {query.UseBaseQueryExpression}");
                 WriteLine($"    .TagWith(\"{query.MethodName}\");");
             }
             else
             {
-                WriteLine($"var query = this.dbContext.{query.Entity.Type.Name}s");
+                WriteLine($"var query = this.dbContext.{query.Entity.Type.Name}Set");
                 WriteLine($"    .AsNoTracking()");
                 WriteLine($"    .TagWith(\"{query.MethodName}\");");
             }
