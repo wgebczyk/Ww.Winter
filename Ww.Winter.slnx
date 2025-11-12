@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />
+    <File Path="NOTES.md" />
     <File Path="README.md" />
   </Folder>
   <Project Path="Ww.Winter.Generator.Tests/Ww.Winter.Generator.Tests.csproj" />
